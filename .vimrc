@@ -167,11 +167,11 @@ au BufRead,BufNewFile *.{go}   set filetype=go
 au BufRead,BufNewFile *.{js}   set filetype=javascript
 
 "记住上次编辑位置
-autocmd BufReadPost *
-      if line("'\"") > 0 && line("'\"") <= line("$") |
-      exe "normal g`\"" |
-      endif
-
+"autocmd BufReadPost *
+"      if line("'\"") > 0 && line("'\"") <= line("$") |
+"      exe "normal g`\"" |
+"      endif
+"
 
 
 "将tab替换为空格
