@@ -196,8 +196,8 @@ func SetTitle()
         call setline(1,"#!/usr/bin/env ruby")
         call append(line("."),"# encoding: utf-8")
         call append(line(".")+1, "")
-"    elseif &filetype == 'mkd'
-"        call setline(1,"<head><meta charset=\"UTF-8\"></head>")
+    elseif &filetype == 'mkd'
+        call setline(1,"<head><meta charset=\"UTF-8\"></head>")
     else 
         call setline(1, "/*************************************************************************") 
         call append(line("."), "    > File Name: ".expand("%")) 
@@ -211,10 +211,12 @@ func SetTitle()
         call append(line(".")+6, "#include<iostream>")
         call append(line(".")+7, "using namespace std;")
         call append(line(".")+8, "")
+        call append(line(".")+9, "int main(int argc, char **argv){return 0;}")
     endif
     if &filetype == 'c'
         call append(line(".")+6, "#include<stdio.h>")
         call append(line(".")+7, "")
+        call append(line(".")+8, "int main(int argc, char **argv){ return 0;}")
     endif
     if expand("%:e") == 'h'
         call append(line(".")+6, "#ifndef _".toupper(expand("%:r"))."_H")
