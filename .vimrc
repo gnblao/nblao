@@ -410,6 +410,10 @@ Bundle 'gmarik/vundle'
 " My Bundles here:
 "
 " original repos on github
+"Bundle 'Valloric/YouCompleteMe'
+"Bundle 'Valloric/ListToggle'
+"Bundle 'scrooloose/syntastic'
+
 Bundle 'tpope/vim-fugitive'
 Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
 Bundle 'Yggdroot/indentLine'
@@ -422,8 +426,8 @@ Bundle 'python-imports.vim'
 "Bundle 'CaptureClipboard'
 Bundle 'ctrlp-modified.vim'
 Bundle 'last_edit_marker.vim'
-"Bundle 'synmark.vim'
-"Bundle 'Python-mode-klen'
+Bundle 'synmark.vim'
+Bundle 'Python-mode-klen'
 Bundle 'SQLComplete.vim'
 Bundle 'jslint.vim'
 Bundle "pangloss/vim-javascript"
@@ -441,10 +445,29 @@ Bundle 'Django-Projects'
 "Bundle 'djangojump'
 " ...
 "
+
+" for ycm
+"let g:ycm_error_symbol = '>>'
+"let g:ycm_warning_symbol = '>*'
+""配置默认的ycm_extra_conf.py
+"let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'  
+""打开vim时不再询问是否加载ycm_extra_conf.py配置
+"let g:ycm_confirm_extra_conf=0   
+""使用ctags生成的tags文件"
+"let g:ycm_collect_identifiers_from_tag_files = 1
+"" 这个leader就映射为逗号“，”
+"let mapleader = "," 
+"nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
+"nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
+"nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+"nmap <F4> :YcmDiags<CR>
+"
+
+
 "ctrlp设置
 "
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
-let g:ctrlp_extensions = ['funky']
+"let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+"let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
+"let g:ctrlp_extensions = ['funky']
