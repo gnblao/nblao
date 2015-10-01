@@ -45,18 +45,18 @@ set whichwrap=b,s,<,>,[,]
 "endif
 
 set foldenable                 " 允许折叠   
-set foldmethod=manual          " 手动折叠  
+"set foldmethod=manual          " 手动折叠  
 set foldcolumn=0
-set foldmethod=indent 
+set foldmethod=syntax 
 set foldlevel=3 
 " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
 "set ignorecase
 
 " 设置背景主题     
-color desert    
+"color desert    
 "colorscheme molokai
-"color ron     
-"color torte    
+color pablo      
+"color corporation    
 "状态行显示的内容 
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}   
 
@@ -82,7 +82,7 @@ Bundle 'gmarik/vundle'
 " My Bundles here:
 " original repos on github
 Bundle 'Valloric/YouCompleteMe'
-Bundle 'rdnetto/YCM-Generator'
+"Bundle 'rdnetto/YCM-Generator'
 Bundle 'tpope/vim-fugitive'
 Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
 Bundle 'git://git.wincent.com/command-t.git'
@@ -97,6 +97,8 @@ Bundle 'scrooloose/syntastic'
 Bundle 'fatih/vim-go'
 Bundle 'SirVer/ultisnips'
 Bundle 'majutsushi/tagbar'
+"Bundle 'dgryski/vim-godef'
+"Bundle 'nsf/gocode', {'rtp': 'vim/'}
 
 " non github repos
 Bundle 'Yggdroot/indentLine'
