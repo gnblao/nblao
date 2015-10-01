@@ -45,9 +45,9 @@ set whichwrap=b,s,<,>,[,]
 "endif
 
 set foldenable                 " 允许折叠   
-"set foldmethod=manual          " 手动折叠  
+set foldmethod=manual          " 手动折叠  
 set foldcolumn=0
-set foldmethod=syntax 
+"set foldmethod=syntax 
 set foldlevel=3 
 " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
 "set ignorecase
