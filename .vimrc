@@ -32,6 +32,7 @@ set whichwrap+=<,>,h,l          " 允许backspace和光标键跨越行边界
 set diffopt+=iwhite             " 设置diff模式忽略空行
 set nocul                       " 高亮光标所在行 ，行线
 set nocuc                       " 显示光标所在的列，列线
+set background=dark             " 设置背景
 set smartcase
 set cindent
 set confirm
@@ -54,8 +55,8 @@ set foldlevel=3
 
 " 设置背景主题     
 "color desert    
-"colorscheme molokai
-color pablo      
+colorscheme molokai
+"color pablo      
 "color corporation    
 "状态行显示的内容 
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}   
