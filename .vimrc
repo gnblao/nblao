@@ -54,8 +54,10 @@ set foldlevel=3
 "set ignorecase
 
 " 设置背景主题     
-"color desert    
+let g:molokai_original = 1
+let g:rehash256 = 1
 colorscheme molokai
+"color desert    
 "color pablo      
 "color corporation    
 "状态行显示的内容 
