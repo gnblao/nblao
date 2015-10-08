@@ -117,6 +117,9 @@ Bundle "pangloss/vim-javascript"
 Bundle 'tacahiroy/ctrlp-funky'
 Bundle 'jsbeautify'
 
+" for python
+Bundle 'davidhalter/jedi'
+
 "django
 "Bundle 'django_templates.vim'
 "Bundle 'Django-Projects'
@@ -388,7 +391,7 @@ let g:ycm_key_invoke_completion = '<C-Space>'
 let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 "配置默认的ycm_extra_conf.py
-let g:ycm_global_ycm_extra_conf = '/home/nblao/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/ycm_extra_conf.py'  
+let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
 "打开vim时不再询问是否加载ycm_extra_conf.py配置
 let g:ycm_confirm_extra_conf=0   
 "使用ctags生成的tags文件"

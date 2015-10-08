@@ -114,7 +114,10 @@ flags = [
 #for you
 '-I',
 '/usr/include',
-'/usr/include/c++/4.8.2',
+'-I',
+'/usr/include/c++/4.8.2/',
+'-I',
+'/usr/include/c++/4.8.2/tr1/',
 ]
 
 
