@@ -118,7 +118,8 @@ Bundle 'tacahiroy/ctrlp-funky'
 Bundle 'jsbeautify'
 
 " for python
-Bundle 'davidhalter/jedi'
+"Bundle 'davidhalter/jedi'
+Bundle 'klen/python-mode'
 
 "django
 "Bundle 'django_templates.vim'
@@ -443,3 +444,17 @@ let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
 let g:ctrlp_extensions = ['funky']
 "colorscheme molokai
+
+
+"for python
+"if &filetype == 'py' || &filetype == 'python' 
+    " Override go-to.definition key shortcut to Ctrl-]
+    let  g:pymode_rope_goto_definition_bind = "<C-]>"
+    
+    " Override run current python file key shortcut to Ctrl-Shift-e
+    let g:pymode_run_bind = "<C-S-e>"
+    
+    " Override view python doc key shortcut to Ctrl-Shift-d
+    let g:pymode_doc_bind = "<C-S-d>"
+"endif
+
