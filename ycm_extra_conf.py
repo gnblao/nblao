@@ -79,6 +79,7 @@ flags = [
 # For a C project, you would set this to something like 'c99' instead of
 # 'c++11'.
 '-std=c++11',
+#'-std=gnu99',
 
 #add for kernel
 #'-std=c99',
@@ -115,9 +116,23 @@ flags = [
 '-I',
 '/usr/include',
 '-I',
-'/usr/include/c++/4.8.2/',
+'/usr/include/c++/5.1.1/',
 '-I',
-'/usr/include/c++/4.8.2/tr1/',
+'/usr/include/c++/5.1.1/tr1/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/core/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/event/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/os/unix/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/stream/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/misc/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/http/',
+'-I',
+'/home/log/cdev/nginx-1.9.10/src/mail/',
 ]
 
 

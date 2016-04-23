@@ -95,6 +95,9 @@ Bundle 'FuzzyFinder'
 "左窗口文件目录
 Bundle 'scrooloose/nerdtree'                 
 Bundle 'scrooloose/syntastic'                 
+"对齐
+Bundle 'tsaleh/vim-align'          
+
 
 "for golang
 Bundle 'fatih/vim-go'
