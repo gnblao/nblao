@@ -477,3 +477,5 @@ let g:ctrlp_extensions = ['funky']
     let g:pymode_doc_bind = "<C-S-d>"
 "endif
 
+
+"map lw oBd_Log::warning("***********lw*************".var_export($, true));<ESC>F$1li
