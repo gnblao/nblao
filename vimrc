@@ -54,7 +54,8 @@ set foldlevel=3
 "set ignorecase
 
 "状态行显示的内容 
-set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}   
+"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}\ [PWD=%{getcwd()}]\ 
+set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
 
 "set completeopt=preview,menu 
 set completeopt=menu 
@@ -138,6 +139,7 @@ func SetTitle()
         call setline(1,"#!/usr/bin/env python")
         call append(line("$"),"# coding=utf-8")
         call append(line("$"), "") 
+        call append(line("$"), "") 
     elseif &filetype == 'ruby'
         call setline(1,"#!/usr/bin/env ruby")
         call append(line("$"),"# encoding: utf-8")
@@ -180,7 +182,7 @@ func SetTitle()
         call append(line("$"), "#include<stdio.h>")
         call append(line("$"), "")
         call append(line("$"), "")
-        call append(line("$"), "int main(int argc, char **argv){")
+        call append(line("$"), "int main(int argc, char **argv) {")
         call append(line("$"), "")
         call append(line("$"), "\treturn 0;")
         call append(line("$"), "}")
@@ -207,7 +209,8 @@ let g:ycm_key_invoke_completion = '<C-Space>'
 let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 "配置默认的ycm_extra_conf.py
-let g:ycm_global_ycm_extra_conf = '~/kernel/linux-4.7.3/.ycm_extra_conf.py'  
+"let g:ycm_global_ycm_extra_conf = '~/kernel/linux-4.7.3/.ycm_extra_conf.py'  
+let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
 "打开vim时不再询问是否加载ycm_extra_conf.py配置
 let g:ycm_confirm_extra_conf=0   
 "使用ctags生成的tags文件"
@@ -217,7 +220,7 @@ let mapleader =","
 
 if &filetype != 'go'
     "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-    "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
+    nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
     nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 endif
 "nmap <F4> :YcmDiags<CR>
@@ -233,23 +236,40 @@ au FileType go nmap <Leader>s <Plug>(go-implements)
 au FileType go nmap <Leader>i <Plug>(go-info)
 au FileType go nmap <Leader>e <Plug>(go-rename)
 
-au FileType go nmap <Leader>ds <Plug>(go-def-split)
-au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
-au FileType go nmap <Leader>dt <Plug>(go-def-tab)
+au FileType go nmap <Leader>gd <Plug>(go-def)
+au FileType go nmap <Leader>gs <Plug>(go-def-split)
+au FileType go nmap <Leader>gv <Plug>(go-def-vertical)
+au FileType go nmap <Leader>gt <Plug>(go-def-tab)
 
-au FileType go nmap <Leader>gd <Plug>(go-doc)
-au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
-au FileType go nmap <Leader>gb <Plug>(go-doc-browser)
+" k=wiki
+au FileType go nmap <Leader>kd <Plug>(go-doc)
+au FileType go nmap <Leader>kv <Plug>(go-doc-vertical)
+au FileType go nmap <Leader>kb <Plug>(go-doc-browser)
 
 " vim-go settings
 let g:go_fmt_command = "goimports"
 
 " for python
-autocmd FileType python set omnifunc=pythoncomplete#Complete
+au FileType python set omnifunc=pythoncomplete#Complete
 
 """"""""""""end YouCompleteme""""""""""""""""""
 
 """""""""""" cscope setting""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("cscope")                                                                                                                              
+	set csprg=/usr/bin/cscope                                                                                                       
+	set csto=0                                                                                                                            
+	set cst                                                                                                                               
+	set nocsverb                                                                                                                          
+	" add any database in current directory                                                                                               
+	if filereadable("cscope.out")                                                                                                         
+		cs add cscope.out                                                                                                                 
+		" else add database pointed to by environment                                                                                         
+	elseif $CSCOPE_DB != ""                                                                                                               
+		cs add $CSCOPE_DB                                                                                                                 
+	endif                                                                                                                                 
+	set csverb                                                                                                                            
+endif                   
+
 nmap <C-@>g :cs find g <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>c :cs find c <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>t :cs find t <C-R>=expand("<cword>")<CR><CR>
@@ -279,13 +299,13 @@ imap <F7>  <ESC> :TagberToggle<CR>
 "go的跳转
 let g:godef_split=2
 let g:tagbar_type_go = {                  
-            \    'ctagstype' : 'go',
-            \    'kinds'     : [
-            \        'p:package',
-            \        'i:imports:1',
-            \        'c:constants',
-            \        'v:variables',
-            \        't:types',
+			\    'ctagstype' : 'go',
+			\    'kinds'     : [
+			\        'p:package',
+			\        'i:imports:1',
+			\        'c:constants',
+			\        'v:variables',
+			\        't:types',
             \        'n:interfaces',
             \        'w:fields',
             \        'e:embedded',

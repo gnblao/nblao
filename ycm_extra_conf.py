@@ -78,8 +78,8 @@ flags = [
 # a "-std=<something>".
 # For a C project, you would set this to something like 'c99' instead of
 # 'c++11'.
-'-std=c++11',
-#'-std=gnu99',
+#'-std=c++11',
+'-std=gnu99',
 
 #add for kernel
 #'-std=c99',
@@ -89,7 +89,8 @@ flags = [
 # relevant for c++ headers.
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x',
-'c++',
+'c',
+#'c++',
 #'-isystem',
 #'../BoostParts',
 #'-isystem',
@@ -116,23 +117,23 @@ flags = [
 '-I',
 '/usr/include',
 '-I',
-'/usr/include/c++/5.1.1/',
+'/usr/include/c++/6.2.1/',
 '-I',
-'/usr/include/c++/5.1.1/tr1/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/core/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/event/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/os/unix/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/stream/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/misc/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/http/',
-'-I',
-'/home/log/cdev/nginx-1.9.10/src/mail/',
+'/usr/include/c++/6.2.1/tr2',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/core/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/event/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/os/unix/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/stream/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/misc/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/http/',
+#'-I',
+#'/home/log/cdev/nginx-1.9.10/src/mail/',
 ]
 
 
