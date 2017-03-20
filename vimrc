@@ -84,7 +84,7 @@ call vundle#begin()
 Bundle 'gmarik/vundle'
 " My Bundles here:
 " original repos on github
-Bundle 'Valloric/YouCompleteMe'
+"Bundle 'Valloric/YouCompleteMe'
 Bundle 'rdnetto/YCM-Generator'
 Bundle 'godlygeek/tabular'          
 Bundle 'majutsushi/tagbar'
@@ -100,6 +100,7 @@ Bundle 'Auto-Pairs'
 
 "color
 Bundle 'tomasr/molokai'
+Bundle 'ianva/vim-youdao-translater'
 
 call vundle#end()
 filetype plugin indent on
@@ -328,9 +329,42 @@ let g:tagbar_type_go = {
 """"""""""end tagbar""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+" for style
+"调用AStyle程序，进行代码美化  
+func CodeFormat()  
+          "取得当前光标所在行号  
+          let lineNum = line(".")  
+          "C源程序  
+          if &filetype == 'c'  
+                    "执行调用外部程序的命令  
+                    "exec "%! astyle -A3Lfpjk3NS"  
+                    exec "%! astyle --style=linux"  
+          "H头文件(文件类型识别为cpp)，CPP源程序  
+          elseif &filetype == 'cpp'  
+                    "执行调用外部程序的命令  
+                    "exec "%! astyle -A3Lfpjk3NS"  
+                    exec "%! astyle --style=linux"  
+          "JAVA源程序  
+          elseif &filetype == 'java'  
+                    "执行调用外部程序的命令  
+                    exec "%! astyle -A2Lfpjk3NS"  
+          else   
+                    "提示信息  
+                    echo "不支持".&filetype."文件类型。"  
+          endif  
+          "返回先前光标所在行  
+          exec lineNum  
+endfunc  
+"映射代码美化函数到Shift+f快捷键  
+map <F12> <Esc>:call CodeFormat()<CR>  
+
+vnoremap <silent> <C-F> :<C-u>Ydv<CR>
+nnoremap <silent> <C-F> :<C-u>Ydc<CR>
+noremap <leader>yd :<C-u>Yde<CR>
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
 "set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
+
 let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
 let g:ctrlp_extensions = ['funky']
