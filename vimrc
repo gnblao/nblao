@@ -132,6 +132,7 @@ autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 """"begin根据文件类型插入内容""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call SetTitle()" 
 ""定义函数SetTitle，自动插入文件头 
+let g:project_root = ""
 func SetTitle() 
     if &filetype == 'sh' 
         call setline(1,"\#!/bin/bash") 
@@ -188,11 +189,16 @@ func SetTitle()
         call append(line("$"), "\treturn 0;")
         call append(line("$"), "}")
     endif
-    if expand("%:e") == 'h'
-        call append(line(".")+6, "#ifndef _".toupper(expand("%:r"))."_H")
-        call append(line(".")+7, "#define _".toupper(expand("%:r"))."_H")
-        call append(line(".")+8, "#endif")
-    endif
+    if expand("%:e") == 'h' 
+        if g:project_root == ''
+            call append(line("$"), "#ifndef _".toupper(expand("%:r"))."_H")
+            call append(line("$"), "#define _".toupper(expand("%:r"))."_H")
+            call append(line("$"), "#endif")
+        else 
+            call append(line("$"), "#ifndef ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
+            call append(line("$"), "#define ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
+            call append(line("$"), "#endif  // ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
+        endif
     if &filetype == 'java'
         call append(line(".")+6,"public class ".expand("%:r"))
         call append(line(".")+7,"")
