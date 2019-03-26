@@ -36,6 +36,8 @@ set background=dark             " 设置背景
 set smartcase
 set cindent
 set confirm
+set textwidth=79
+set wrap
 "set linespace=0
 set t_Co=256
 set whichwrap=b,s,<,>,[,]
@@ -70,6 +72,10 @@ filetype indent on           " 针对不同的文件类型采用不同的缩进�
 filetype plugin on           " 针对不同的文件类型加载对应的插件
 filetype plugin indent on    " 启用自动补全
 
+if has("autocmd")
+   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+      \| exe "normal g'\"" | endif
+endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "使用vundle管理vim插件
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -102,6 +108,10 @@ Bundle 'Auto-Pairs'
 Bundle 'tomasr/molokai'
 Bundle 'ianva/vim-youdao-translater'
 
+Bundle 'Shougo/echodoc.vim'
+Bundle 'plasticboy/vim-markdown'
+Bundle 'easymotion/vim-easymotion'
+Bundle 'terryma/vim-multiple-cursors'
 call vundle#end()
 filetype plugin indent on
 
@@ -208,22 +218,42 @@ endfunc
 autocmd BufNewFile * normal G
 """"end根据文件类型插入内容"""""
 
-""""""""""" Vim自动补全神器：YouCompleteMe"""""""""""""""""""""""
-let g:ycm_key_list_select_completion = ['', '']
-let g:ycm_key_list_previous_completion = ['', '']
-let g:ycm_key_invoke_completion = '<C-Space>'
-
-let g:ycm_error_symbol = '>>'
-let g:ycm_warning_symbol = '>*'
-"配置默认的ycm_extra_conf.py
-"let g:ycm_global_ycm_extra_conf = '~/kernel/linux-4.7.3/.ycm_extra_conf.py'  
-let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
-"打开vim时不再询问是否加载ycm_extra_conf.py配置
-let g:ycm_confirm_extra_conf=0   
-"使用ctags生成的tags文件"
-let g:ycm_collect_identifiers_from_tag_files = 1
+"""""""""" Vim自动补全神器：YouCompleteMe"""""""""""""""""""""""
 " 这个leader就映射为逗号“，”
 let mapleader ="," 
+let g:ycm_server_use_vim_stdout = 0
+let g:ycm_server_keep_logfiles = 0
+"let g:ycm_server_log_level = 'debug'
+let g:ycm_global_ycm_extra_conf = '/data1/nblao/ycm_extra_conf.py'  
+"let g:ycm_global_ycm_extra_conf = '/data1/nblao/linux_ycm_extra_conf.py'  
+"let g:ycm_global_ycm_extra_conf = '/data1/nblao/ngx_ycm_extra_conf.py'  
+"打开vim时不再询问是否加载ycm_extra_conf.py配置
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_error_symbol = '>>'
+let g:ycm_warning_symbol = '>*'
+let g:ycm_collect_identifiers_from_tags_files = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
+"let g:ycm_key_list_select_completion = ['<C-TAB>', '<Down>']
+"let g:ycm_key_list_previous_completion = ['<C-S-TAB>','<Up>']
+let g:ycm_key_list_select_completion = ['', '']
+let g:ycm_key_list_previous_completion = ['','']
+let g:ycm_seed_identifiers_with_syntax = 1
+let g:ycm_key_invoke_completion = '<leader><tab>'
+let g:ycm_semantic_triggers =  {
+            \   'c' : ['->', '.', 're!(?=[a-zA-Z_])'],
+            \   'objc' : ['->', '.'],
+            \   'ocaml' : ['.', '#'],
+            \   'cpp,objcpp' : ['->', '.', '::'],
+            \   'perl' : ['->'],
+            \   'php' : ['->', '::'],
+            \   'cs,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+            \   'java,jsp' : ['.'],
+            \   'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
+            \   'ruby' : ['.', '::'],
+            \   'lua' : ['.', ':'],
+            \   'erlang' : [':'],
+            \ }
+"""""""end Ycm""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if &filetype != 'go'
     "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
@@ -344,16 +374,19 @@ func CodeFormat()
           if &filetype == 'c'  
                     "执行调用外部程序的命令  
                     "exec "%! astyle -A3Lfpjk3NS"  
-                    exec "%! astyle --style=linux"  
+                    exec "%! astyle --style=google"  
           "H头文件(文件类型识别为cpp)，CPP源程序  
           elseif &filetype == 'cpp'  
                     "执行调用外部程序的命令  
                     "exec "%! astyle -A3Lfpjk3NS"  
-                    exec "%! astyle --style=linux"  
+                    "exec "%! astyle --style=linux"  
+                    exec "%! astyle --style=google"  
           "JAVA源程序  
           elseif &filetype == 'java'  
                     "执行调用外部程序的命令  
                     exec "%! astyle -A2Lfpjk3NS"  
+          elseif &filetype == 'py'|| &filetype == 'python'
+                    exec "%! yapf --style='{based_on_style: google, indent_width: 4}'"
           else   
                     "提示信息  
                     echo "不支持".&filetype."文件类型。"  
@@ -375,7 +408,22 @@ let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
 let g:ctrlp_extensions = ['funky']
 
+" 设置easymotion的触发键
+let g:EasyMotion_leader_key = '\'
+" 允许设置默认快捷键
+let g:EasyMotion_do_mapping = 1
+" 智能大小写匹配
+let g:EasyMotion_smartcase = 1
+" 按回车自动跳到第一个匹配
+let g:EasyMotion_enter_jump_first = 1
+" s查找字符
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+xmap <Leader>f <Plug>(easymotion-bd-f)
+omap <Leader>f <Plug>(easymotion-bd-f)
+
 nmap tl :Tlist<cr>
 "map lw oBd_Log::warning("***********lw*************".var_export($, true));<ESC>F$1li
 
 
+"cs kill 0
+"cs add /data1/dev/cmap /data1/dev/cmap
