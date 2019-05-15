@@ -1,3 +1,138 @@
+" 1. put this file in location ~/.vimrc
+" 2. install cmake and gcc
+" 3. custom plugin bundle groups
+"   c/cpp require install cscope and clang-format
+"   java/c/cpp require install 'gnu global'
+"   java require install JDK8
+"   python require install flake8, pylintl, yapfl and autopep8(sudo -H pip install flake8 pylint yapf autopep8)
+if !exists('g:bundle_groups')
+    " let g:bundle_groups=['base', 'python', 'c', 'cpp', 'golang', 'html', 'javascript', 'markdown', 'java', 'json', 'shell', 'protobuf', 'thrift']
+    let g:bundle_groups=['base', 'python', 'c', 'cpp', 'markdown', 'json', 'shell', 'protobuf', 'thrift']
+endif
+
+" 4. is enable builty plugin, this require set terminal font to DroidSansMono Nerd\ Font\ 11
+" the font will auto install when vim first running
+let s:builty_vim = 1
+" 5. is enable YouCompleteMe, this need libclang7 above or GLIBC_2.17 above
+let s:enable_ycm = 1
+" 6. run vim, wait for plugins auto install
+" 7. well done!
+
+let s:cpp_clang_highlight = 0
+" check is enable system clipboard
+if has('clipboard') && !empty($DISPLAY)
+    let s:enable_system_clipboard = 1
+else
+    let s:enable_system_clipboard = 0
+endif
+
+" check os
+if !exists("s:os")
+    if has("win64") || has("win32") || has("win16")
+        let s:os = "Windows"
+    else
+        let s:os = substitute(system('uname'), '\n', '', '')
+    endif
+endif
+
+" auto install plugin manager
+if empty(glob('~/.vim/bundle/vundle/autoload/vundle.vim'))
+    silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/vundle
+    "autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    "call InstallAirLineFont()
+endif
+
+set rtp+=~/.vim/bundle/vundle/
+"call vundle#rc()
+call vundle#begin()
+if count(g:bundle_groups, 'base')
+    Bundle 'gmarik/vundle'
+    Bundle 'godlygeek/tabular'          
+    Bundle 'majutsushi/tagbar'
+    Bundle 'scrooloose/nerdtree'                 
+    Bundle 'Auto-Pairs'
+    Bundle 'tomasr/molokai'
+    Bundle 'AndrewRadev/splitjoin.vim'
+    Bundle 'SirVer/ultisnips'
+    Bundle 'Shougo/echodoc.vim'
+    Bundle 'plasticboy/vim-markdown'
+    Bundle 'easymotion/vim-easymotion'
+    Bundle 'terryma/vim-multiple-cursors'
+    Bundle 'ianva/vim-youdao-translater'
+endif
+
+if count(g:bundle_groups, 'python')
+    " PyLint, Rope, Pydoc, breakpoints from box
+    Bundle 'python-mode/python-mode'
+endif
+
+if count(g:bundle_groups, 'golang')
+    Bundle 'fatih/vim-go'
+endif
+
+if count(g:bundle_groups, 'html')
+    " emmet
+    Bundle 'mattn/emmet-vim'
+    " html hilight
+    Bundle 'othree/html5.vim'
+    " always highlights the enclosing html/xml tags
+    Bundle 'Valloric/MatchTagAlways'
+endif
+
+if count(g:bundle_groups, 'javascript')
+    " javascript hilight
+    Bundle 'pangloss/vim-javascript'
+endif
+
+if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
+    " async generate and update ctags/gtags
+    Bundle 'ludovicchabant/vim-gutentags'
+    Bundle 'skywind3000/gutentags_plus'
+endif
+
+if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+    " switching between companion source files (e.g. ".h" and ".cpp")
+    Bundle 'derekwyatt/vim-fswitch'
+endif
+
+    "Bundle 'Valloric/YouCompleteMe'
+    "Bundle 'rdnetto/YCM-Generator'
+let s:is_system_clang = 0
+if s:os == "Linux"
+    let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
+    let s:is_libclang7_install+=str2nr(system('strings `ldconfig -p | grep "libclang.so$" | awk -F" "' . " '" . '{print $NF}'. "'" . '` | grep "version [789].[0-9].[0-9]" | wc -l'))
+    if s:is_libclang7_install > 0
+        let s:is_system_clang = 1
+    endif
+endif
+" powerful code-completion engine
+if exists("s:enable_ycm")  && s:enable_ycm == 1
+    Bundle 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+    if s:is_system_clang
+        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
+    else
+        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-completer' }
+    endif
+endif
+
+if count(g:bundle_groups, 'markdown')
+    " markdown highlight
+    Bundle 'plasticboy/vim-markdown'
+    " markdown preview
+    Bundle 'iamcco/markdown-preview.vim'
+    " markdown mathjax preview
+    Bundle 'iamcco/mathjax-support-for-mkdp'
+endif
+
+if count(g:bundle_groups, 'json')
+    " json highlight
+    Bundle 'elzr/vim-json'
+endif
+
+
+call vundle#end()
+
+
 set encoding=utf-8
 set nocompatible                " 关闭 vi 兼容模式
 set shortmess=atI               " 启动的时候不显示那个援助乌干达儿童的提示 
@@ -82,37 +217,6 @@ endif
 " Vundle
 set nocompatible              
 filetype off      
-set rtp+=~/.vim/bundle/vundle/
-"call vundle#rc()
-call vundle#begin()
-" let Vundle manage Vundle
-" required! 
-Bundle 'gmarik/vundle'
-" My Bundles here:
-" original repos on github
-"Bundle 'Valloric/YouCompleteMe'
-Bundle 'rdnetto/YCM-Generator'
-Bundle 'godlygeek/tabular'          
-Bundle 'majutsushi/tagbar'
-Bundle 'scrooloose/nerdtree'                 
-
-"for golang
-Bundle 'fatih/vim-go'
-Bundle 'AndrewRadev/splitjoin.vim'
-Bundle 'SirVer/ultisnips'
-
-" non github repos
-Bundle 'Auto-Pairs'
-
-"color
-Bundle 'tomasr/molokai'
-Bundle 'ianva/vim-youdao-translater'
-
-Bundle 'Shougo/echodoc.vim'
-Bundle 'plasticboy/vim-markdown'
-Bundle 'easymotion/vim-easymotion'
-Bundle 'terryma/vim-multiple-cursors'
-call vundle#end()
 filetype plugin indent on
 
 " 设置背景主题     
