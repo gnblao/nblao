@@ -18,6 +18,7 @@ let s:enable_ycm = 1
 " 6. run vim, wait for plugins auto install
 " 7. well done!
 
+
 let s:cpp_clang_highlight = 0
 " check is enable system clipboard
 if has('clipboard') && !empty($DISPLAY)
@@ -313,6 +314,7 @@ func SetTitle()
             call append(line("$"), "#define ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
             call append(line("$"), "#endif  // ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
         endif
+    endif
     if &filetype == 'java'
         call append(line(".")+6,"public class ".expand("%:r"))
         call append(line(".")+7,"")
