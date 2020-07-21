@@ -43,6 +43,16 @@ if empty(glob('~/.vim/bundle/vundle/autoload/vundle.vim'))
     "call InstallAirLineFont()
 endif
 
+let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
+let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
+if s:is_universal_ctags > 1
+    let s:is_exuberant_ctags = 0
+endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"使用vundle管理vim插件
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set rtp+=~/.vim/bundle/vundle/
 "call vundle#rc()
 call vundle#begin()
@@ -55,12 +65,56 @@ if count(g:bundle_groups, 'base')
     Bundle 'tomasr/molokai'
     Bundle 'AndrewRadev/splitjoin.vim'
     Bundle 'SirVer/ultisnips'
-    Bundle 'Shougo/echodoc.vim'
-    Bundle 'plasticboy/vim-markdown'
+"#    Bundle 'Shougo/echodoc.vim'
     Bundle 'easymotion/vim-easymotion'
     Bundle 'terryma/vim-multiple-cursors'
     Bundle 'ianva/vim-youdao-translater'
 endif
+
+let s:is_system_clang = 0
+if s:os == "Linux"
+    let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
+    let s:is_libclang7_install+=str2nr(system('strings `ldconfig -p | grep "libclang.so$" | awk -F" "' . " '" . '{print $NF}'. "'" . '` | grep "version [789].[0-9].[0-9]" | wc -l'))
+    if s:is_libclang7_install > 0
+        let s:is_system_clang = 1
+    endif
+endif
+" powerful code-completion engine
+if exists("s:enable_ycm")  && s:enable_ycm == 1
+    Bundle 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+    if s:is_system_clang
+        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
+    else
+        Bundle 'Valloric/YouCompleteMe', { 'do': ' git submodule update --init --recursive && ./install.py --clang-completer --java-completer' }
+    endif
+endif
+
+
+if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
+    " async generate and update ctags/gtags
+    Bundle 'ludovicchabant/vim-gutentags'
+    " Bundle 'skywind3000/gutentags_plus'
+    Bundle 'TC500/gutentags_plus'
+endif
+
+if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+    " switching between companion source files (e.g. .h and .cpp)
+    Bundle 'derekwyatt/vim-fswitch'
+endif
+
+if count(g:bundle_groups, 'cpp')
+    " cpp highlight
+    if exists("s:cpp_clang_highlight")  && s:cpp_clang_highlight == 1
+        if s:is_system_clang
+            Bundle 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake -DDOWNLOAD_CLANG=0 ~/.vim/bundle/color_coded/ && make && make install'}
+        else
+            Bundle 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake ~/.vim/bundle/color_coded/ && make && make install'}
+        endif
+    else
+        Bundle 'bfrg/vim-cpp-modern'
+    endif
+endif
+
 
 if count(g:bundle_groups, 'python')
     " PyLint, Rope, Pydoc, breakpoints from box
@@ -85,36 +139,6 @@ if count(g:bundle_groups, 'javascript')
     Bundle 'pangloss/vim-javascript'
 endif
 
-if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
-    " async generate and update ctags/gtags
-    Bundle 'ludovicchabant/vim-gutentags'
-    Bundle 'skywind3000/gutentags_plus'
-endif
-
-if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
-    " switching between companion source files (e.g. ".h" and ".cpp")
-    Bundle 'derekwyatt/vim-fswitch'
-endif
-
-    "Bundle 'Valloric/YouCompleteMe'
-    "Bundle 'rdnetto/YCM-Generator'
-let s:is_system_clang = 0
-if s:os == "Linux"
-    let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
-    let s:is_libclang7_install+=str2nr(system('strings `ldconfig -p | grep "libclang.so$" | awk -F" "' . " '" . '{print $NF}'. "'" . '` | grep "version [789].[0-9].[0-9]" | wc -l'))
-    if s:is_libclang7_install > 0
-        let s:is_system_clang = 1
-    endif
-endif
-" powerful code-completion engine
-if exists("s:enable_ycm")  && s:enable_ycm == 1
-    Bundle 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-    if s:is_system_clang
-        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
-    else
-        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-completer' }
-    endif
-endif
 
 if count(g:bundle_groups, 'markdown')
     " markdown highlight
@@ -133,8 +157,53 @@ endif
 
 call vundle#end()
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"使用vundle管理vim插件
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+
+" -encode set begin-
 set encoding=utf-8
+set termencoding=utf-8
+set fileencoding=utf-8
+"multi-encoding setting
+if has("multi_byte")
+    " set bomb
+    set fileencodings=ucs-bom,utf-8,cp936,big5,euc-jp,euc-kr,latin1
+    " CJK environment detection and corresponding setting
+    if v:lang =~ "^zh_CN"
+        " Use cp936 to support GBK, euc-cn == gb2312
+        set encoding=cp936
+        set termencoding=cp936
+        set fileencoding=cp936
+    elseif v:lang =~ "^zh_TW"
+        " cp950, big5 or euc-tw
+        " Are they equal to each other?
+        set encoding=big5
+        set termencoding=big5
+        set fileencoding=big5
+    elseif v:lang =~ "^ko"
+        " Copied from someone's dotfile, untested
+        set encoding=euc-kr
+        set termencoding=euc-kr
+        set fileencoding=euc-kr
+    elseif v:lang =~ "^ja_JP"
+        " Copied from someone's dotfile, untested
+        set encoding=euc-jp
+        set termencoding=euc-jp
+        set fileencoding=euc-jp
+    endif
+    " Detect UTF-8 locale, and replace CJK setting if needed
+    if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
+        set encoding=utf-8
+        set termencoding=utf-8
+        set fileencoding=utf-8
+    endif
+else
+    echoerr "Sorry, this version of (g)vim was not compiled with multi_byte"
+endif
+" -encode set end -
+
 set nocompatible                " 关闭 vi 兼容模式
 set shortmess=atI               " 启动的时候不显示那个援助乌干达儿童的提示 
 set showcmd                     " 输入的命令显示出来，看的清楚些 
@@ -152,7 +221,7 @@ set number                      " 显示行号
 set history=1000                " 历史记录数
 set incsearch                   " 实时搜索
 set hlsearch                    " 搜索时高亮显示被找到的文本
-set cmdheight=1                 " 设定命令行的行数为 1
+set cmdheight=2                 " 设定命令行的行数为 1
 set helplang=cn                 " 显示中文帮助
 set langmenu=zh_CN.UTF-8        " 语言设置
 set iskeyword+=_,$,@,%,#,-      " 带有如下符号的单词不要被换行分割
@@ -195,8 +264,9 @@ set foldlevel=3
 "set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}\ [PWD=%{getcwd()}]\ 
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
 
-"set completeopt=preview,menu 
-set completeopt=menu 
+"see help completeopt
+set completeopt=preview,menu 
+"set completeopt=menu 
 
 "自动语法高亮
 syntax on
@@ -212,13 +282,19 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
       \| exe "normal g'\"" | endif
 endif
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"使用vundle管理vim插件
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vundle
-set nocompatible              
-filetype off      
-filetype plugin indent on
+
+if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+    " enables automatic C program indenting
+    set cindent
+    " see :help cinoptions-values
+    set cinoptions=:0,p0,t0
+    " These keywords start an extra indent in the next line when 'smartindent' or 'cindent' is set
+    set cinwords+=if,else,while,do,for,switch,case,try,catch
+endif
+"""""""""""""""""""""""""""""""""""""""set"""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+""""""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
 
 " 设置背景主题     
 let g:molokai_original = 1
@@ -247,13 +323,13 @@ autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 """"begin根据文件类型插入内容""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call SetTitle()" 
 ""定义函数SetTitle，自动插入文件头 
-let g:project_root = ""
+let g:project_root = "/opt/work/cmap"
 func SetTitle() 
     if &filetype == 'sh' 
         call setline(1,"\#!/bin/bash") 
         call append(line("$"), "") 
     elseif &filetype == 'python'
-        call setline(1,"#!/usr/bin/env python")
+        call setline(1,"#!/usr/bin/env python3")
         call append(line("$"),"# coding=utf-8")
         call append(line("$"), "") 
         call append(line("$"), "") 
@@ -324,102 +400,183 @@ endfunc
 autocmd BufNewFile * normal G
 """"end根据文件类型插入内容"""""
 
+" vim-cpp-modern
+" Enable highlighting of named requirements (C++20 library concepts)
+let g:cpp_named_requirements_highlight = 1
+
+" YouCompleteMe
+if exists("s:enable_ycm")  && s:enable_ycm == 1
+    if !empty(glob("~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"))
+        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"
+    endif
+    if !empty(glob("~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"))
+        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+    endif
+    if !empty(glob("~/.vim/bundle/YouCompleteMe/third_party/ycmd/examples/.ycm_extra_conf.py"))
+        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/examples/.ycm_extra_conf.py"
+    endif
+    if !empty(glob("~/.vim/.ycm_extra_conf.py"))
+        let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
+    endif
+    if !empty(glob(".ycm_extra_conf.py"))
+        let g:ycm_global_ycm_extra_conf = ".ycm_extra_conf.py"
+    endif
+    let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
+    " autoload .ycm_extra_conf.py, no need confirm
+    let g:ycm_confirm_extra_conf=0
+    let g:ycm_complete_in_comments=1
+    let g:ycm_collect_identifiers_from_tags_files=1
+    let g:ycm_min_num_of_chars_for_completion=1
+    let g:ycm_cache_omnifunc=0
+    " YCM's identifier completer will seed its identifier database with the keywords of the programming language
+    let g:ycm_seed_identifiers_with_syntax=1
+    " show the completion menu even when typing inside strings
+    let g:ycm_complete_in_strings = 1
+    " show the completion menu even when typing inside comments
+    let g:ycm_complete_in_comments = 1
+    " eclim file type validate conflict with YouCompleteMe
+    let g:EclimFileTypeValidate = 0
+    " YCM will populate the location list automatically every time it gets new diagnostic data
+    let g:ycm_always_populate_location_list = 1
+    " Let clangd fully control code completion
+    let g:ycm_clangd_uses_ycmd_caching = 0
+
+    augroup ycm_
+        autocmd!
+        " goto next location list
+        " goto previous location list
+        autocmd BufRead,BufNewFile * if count(['cpp','c','python','java','go'], &ft) |
+                    \ nmap <buffer> <C-g> :YcmCompleter GoToDefinitionElseDeclaration <C-R>=expand("<cword>")<CR><CR> |
+                    \ nmap <buffer> <leader>gy :YcmCompleter FixIt<CR> |
+                    \ nnoremap <buffer> <leader>t :YcmCompleter GetType<CR> |
+                    \ nmap <buffer> [l :lnext<CR> |
+                    \ nmap <buffer> ]l :lprevious<CR> | endif
+    augroup END
+    " make YCM compatible with UltiSnips (using supertab)
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+    let g:ycm_max_diagnostics_to_display = 0
+    let g:SuperTabDefaultCompletionType = '<C-n>'
+endif  "s:enable_ycm
+
+" gutentags_plus
+" disable default keymap
+let g:gutentags_plus_nomap = 1
+" auto switch to quickfix window
+let g:gutentags_plus_switch = 1
+" auto close quickfix if press <CR>
+let g:gutentags_plus_auto_close_list = 0
+" find this symbol
+noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+" find this definition
+noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+" find functions calling this function
+noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+" find this text string
+noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+" find this egrep pattern
+noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+" find this file
+noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+" find files #including this file
+noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+" find functions called by this function
+noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+" find places where this symbol is assigned a value
+noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+" project root dir flag contant .root and .git
+let g:gutentags_project_root = ['.root']
+" Specifies a directory in which to create all the tags files, instead of writing them at the root of each project
+let g:gutentags_cache_dir = expand('~/.cache/tags')
+let g:gutentags_resolve_symlinks = 1
+let g:gutentags_modules = []
+if executable('gtags') && executable('gtags-cscope')
+    " gtags first
+    let g:gutentags_modules += ['gtags_cscope']
+elseif executable('ctags')
+    " then ctags
+    let g:gutentags_modules += ['ctags']
+endif
+let g:gutentags_ctags_tagfile = '.tags'
+let g:gutentags_ctags_extra_args = []
+let g:gutentags_ctags_extra_args += ['--fields=+niaztKS', '--extra=+qf']
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+" disable gutentags auto load, gutentags_plus plugin handles switching databases automatically before performing a query
+let g:gutentags_auto_add_gtags_cscope = 0
+" force update tags file
+let g:gutentags_define_advanced_commands = 1
+nmap <leader>u :GutentagsUpdate! <CR><CR>
+
+
 """""""""" Vim自动补全神器：YouCompleteMe"""""""""""""""""""""""
 " 这个leader就映射为逗号“，”
-let mapleader ="," 
-let g:ycm_server_use_vim_stdout = 0
-let g:ycm_server_keep_logfiles = 0
+"let mapleader ="," 
+"let g:ycm_server_use_vim_stdout = 0
+"let g:ycm_server_keep_logfiles = 0
 "let g:ycm_server_log_level = 'debug'
-let g:ycm_global_ycm_extra_conf = '/data1/nblao/ycm_extra_conf.py'  
-"let g:ycm_global_ycm_extra_conf = '/data1/nblao/linux_ycm_extra_conf.py'  
-"let g:ycm_global_ycm_extra_conf = '/data1/nblao/ngx_ycm_extra_conf.py'  
-"打开vim时不再询问是否加载ycm_extra_conf.py配置
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_error_symbol = '>>'
-let g:ycm_warning_symbol = '>*'
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_collect_identifiers_from_comments_and_strings = 1
+"let g:ycm_global_ycm_extra_conf = '/home/liwanchuan/nblao/ycm_extra_conf.py'  
+""打开vim时不再询问是否加载ycm_extra_conf.py配置
+"let g:ycm_confirm_extra_conf = 0
+"let g:ycm_error_symbol = '>>'
+"let g:ycm_warning_symbol = '>*'
+"let g:ycm_collect_identifiers_from_tags_files = 1
+"let g:ycm_collect_identifiers_from_comments_and_strings = 1
 "let g:ycm_key_list_select_completion = ['<C-TAB>', '<Down>']
 "let g:ycm_key_list_previous_completion = ['<C-S-TAB>','<Up>']
-let g:ycm_key_list_select_completion = ['', '']
-let g:ycm_key_list_previous_completion = ['','']
-let g:ycm_seed_identifiers_with_syntax = 1
-let g:ycm_key_invoke_completion = '<leader><tab>'
-let g:ycm_semantic_triggers =  {
-            \   'c' : ['->', '.', 're!(?=[a-zA-Z_])'],
-            \   'objc' : ['->', '.'],
-            \   'ocaml' : ['.', '#'],
-            \   'cpp,objcpp' : ['->', '.', '::'],
-            \   'perl' : ['->'],
-            \   'php' : ['->', '::'],
-            \   'cs,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
-            \   'java,jsp' : ['.'],
-            \   'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
-            \   'ruby' : ['.', '::'],
-            \   'lua' : ['.', ':'],
-            \   'erlang' : [':'],
-            \ }
+"let g:ycm_key_list_select_completion = ['', '']
+"let g:ycm_key_list_previous_completion = ['','']
+"let g:ycm_seed_identifiers_with_syntax = 1
+"let g:ycm_key_invoke_completion = '<leader><tab>'
+"let g:ycm_semantic_triggers =  {
+"            \   'c' : ['->', '.', 're!(?=[a-zA-Z_])'],
+"            \   'objc' : ['->', '.'],
+"            \   'ocaml' : ['.', '#'],
+"            \   'cpp,objcpp' : ['->', '.', '::'],
+"            \   'perl' : ['->'],
+"            \   'php' : ['->', '::'],
+"            \   'cs,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+"            \   'java,jsp' : ['.'],
+"            \   'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
+"            \   'ruby' : ['.', '::'],
+"            \   'lua' : ['.', ':'],
+"            \   'erlang' : [':'],
+"            \ }
 """""""end Ycm""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+let mapleader = ","
 if &filetype != 'go'
     "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
     nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
     nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+elseif &filetype == 'go'
+    "for golang
+    " vim-go custom mappings
+    nnoremap <leader>r <Plug>(go-run)
+    nnoremap <leader>b <Plug>(go-build)
+    nnoremap <leader>t <Plug>(go-test)
+    nnoremap <leader>c <Plug>(go-coverage)
+    nnoremap <Leader>s <Plug>(go-implements)
+    nnoremap <Leader>i <Plug>(go-info)
+    nnoremap <Leader>e <Plug>(go-rename)
+    
+    nnoremap <Leader>gd <Plug>(go-def)
+    nnoremap <Leader>gs <Plug>(go-def-split)
+    nnoremap <Leader>gv <Plug>(go-def-vertical)
+    nnoremap <Leader>gt <Plug>(go-def-tab)
+    " k=wiki
+    nnoremap <Leader>kd <Plug>(go-doc)
+    nnoremap <Leader>kv <Plug>(go-doc-vertical)
+    nnoremap <Leader>kb <Plug>(go-doc-browser)
+    
 endif
+
 "nmap <F4> :YcmDiags<CR>
-
-"for golang
-let mapleader = ","
-" vim-go custom mappings
-au FileType go nmap <leader>r <Plug>(go-run)
-au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
-au FileType go nmap <leader>c <Plug>(go-coverage)
-au FileType go nmap <Leader>s <Plug>(go-implements)
-au FileType go nmap <Leader>i <Plug>(go-info)
-au FileType go nmap <Leader>e <Plug>(go-rename)
-
-au FileType go nmap <Leader>gd <Plug>(go-def)
-au FileType go nmap <Leader>gs <Plug>(go-def-split)
-au FileType go nmap <Leader>gv <Plug>(go-def-vertical)
-au FileType go nmap <Leader>gt <Plug>(go-def-tab)
-
-" k=wiki
-au FileType go nmap <Leader>kd <Plug>(go-doc)
-au FileType go nmap <Leader>kv <Plug>(go-doc-vertical)
-au FileType go nmap <Leader>kb <Plug>(go-doc-browser)
-
 " vim-go settings
 let g:go_fmt_command = "goimports"
 
 " for python
 au FileType python set omnifunc=pythoncomplete#Complete
-
-""""""""""""end YouCompleteme""""""""""""""""""
-
-"""""""""""" cscope setting""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("cscope")                                                                                                                              
-	set csprg=/usr/bin/cscope                                                                                                       
-	set csto=0                                                                                                                            
-	set cst                                                                                                                               
-	set nocsverb                                                                                                                          
-	" add any database in current directory                                                                                               
-	if filereadable("cscope.out")                                                                                                         
-		cs add cscope.out                                                                                                                 
-		" else add database pointed to by environment                                                                                         
-	elseif $CSCOPE_DB != ""                                                                                                               
-		cs add $CSCOPE_DB                                                                                                                 
-	endif                                                                                                                                 
-	set csverb                                                                                                                            
-endif                   
-
-nmap <C-@>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-nmap <C-@>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-nmap <C-@>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-nmap <C-@>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-nmap <C-@>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-nmap <C-@>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-nmap <C-@>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 
 """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
@@ -437,7 +594,7 @@ let NERDTreeQuitOnOpen=1
 """""""""tagbar begin""""""""""""""""""""""""""""""""""
 "当前文件taglist 窗口  
 map <F7>  :TagbarToggle<CR>
-imap <F7>  <ESC> :TagberToggle<CR>
+imap <F7>  <ESC> :TagbarToggle<CR>
 "go的tags窗口也
 "go的跳转
 let g:godef_split=2
@@ -532,4 +689,4 @@ nmap tl :Tlist<cr>
 
 
 "cs kill 0
-"cs add /data1/dev/cmap /data1/dev/cmap
+

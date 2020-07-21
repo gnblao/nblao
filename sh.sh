@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum install -y ncurses-devel libtool-ltdl-devel
+yum install -y ncurses-devel libtool-ltdl-devel cmake
 
 set -x
 mkdir -p  tmp && cd tmp
@@ -31,14 +31,14 @@ git clone https://github.com/vim/vim.git
 cd vim  && ./configure --with-features=huge \
     --enable-multibyte \
     --enable-rubyinterp=yes \
-    --enable-pythoninterp=yes \
-    --with-python-config-dir=/usr/lib/python2.7/config \
     --enable-python3interp=yes \
-    --with-python3-config-dir=/usr/lib/python3.5/config \
+    --with-python3-command=~/work/anaconda2/envs/py36env/bin/python3 \
     --enable-perlinterp=yes \
     --enable-luainterp=yes \
     --enable-gui=gtk2 --enable-cscope --prefix=$HOME/env && make install && cd ..
 
+#    --enable-pythoninterp=yes \
+#    --with-python-config-dir=/usr/lib/python2.7/config \
 
 if [ $? -ne 0  ]; then
     echo " Install vim Failed"
