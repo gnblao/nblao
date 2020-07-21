@@ -515,7 +515,6 @@ nmap <leader>u :GutentagsUpdate! <CR><CR>
 "let g:ycm_server_use_vim_stdout = 0
 "let g:ycm_server_keep_logfiles = 0
 "let g:ycm_server_log_level = 'debug'
-"let g:ycm_global_ycm_extra_conf = '/home/liwanchuan/nblao/ycm_extra_conf.py'  
 ""打开vim时不再询问是否加载ycm_extra_conf.py配置
 "let g:ycm_confirm_extra_conf = 0
 "let g:ycm_error_symbol = '>>'
