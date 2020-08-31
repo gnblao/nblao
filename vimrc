@@ -83,9 +83,9 @@ endif
 if exists("s:enable_ycm")  && s:enable_ycm == 1
     Bundle 'rdnetto/YCM-Generator', { 'branch': 'stable'}
     if s:is_system_clang
-        Bundle 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
+        Bundle 'ycm-core/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
     else
-        Bundle 'Valloric/YouCompleteMe', { 'do': ' git submodule update --init --recursive && ./install.py --clang-completer --java-completer' }
+        Bundle 'ycm-core/YouCompleteMe', { 'do': ' git submodule update --init --recursive && ./install.py --clang-completer --java-completer' }
     endif
 endif
 
