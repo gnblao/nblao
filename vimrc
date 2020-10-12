@@ -1,31 +1,31 @@
 " 1. put this file in location ~/.vimrc
 " 2. install cmake and gcc
 " 3. custom plugin bundle groups
-"   c/cpp require install cscope and clang-format
-"   java/c/cpp require install 'gnu global'
-"   java require install JDK8
-"   python require install flake8, pylintl, yapfl and autopep8(sudo -H pip install flake8 pylint yapf autopep8)
+"   c/cpp require install cscope clang-format GNU-global
+"   java/c/cpp/scala/python require install GNU-global and https://github.com/yoshizow/global-pygments-plugin
+"   scala require pip install websocket-client sexpdata
+"   scala require sbt
+"   java require install JDK8 or JDK11
+"   python require install flake8, pylintl, yapf and autopep8(sudo -H pip install flake8 pylint yapf autopep8)
 if !exists('g:bundle_groups')
-    " let g:bundle_groups=['base', 'python', 'c', 'cpp', 'golang', 'html', 'javascript', 'markdown', 'java', 'json', 'shell', 'protobuf', 'thrift']
-    let g:bundle_groups=['base', 'python', 'c', 'cpp', 'markdown', 'json', 'shell', 'protobuf', 'thrift']
+    " let g:bundle_groups=['base', 'python', 'c', 'cpp', 'golang', 'html', 'javascript', 'markdown', 'java', 'json', 'shell', 'protobuf', 'thrift', 'scala']
+    let g:bundle_groups=['base', 'python', 'c', 'cpp', 'markdown', 'json', 'shell', 'protobuf', 'thrift', 'scala', 'golang', 'java']
 endif
-
 " 4. is enable builty plugin, this require set terminal font to DroidSansMono Nerd\ Font\ 11
 " the font will auto install when vim first running
 let s:builty_vim = 1
-" 5. is enable YouCompleteMe, this need libclang7 above or GLIBC_2.17 above
-let s:enable_ycm = 1
-" 6. run vim, wait for plugins auto install
-" 7. well done!
+" 5. is enable YouCompleteMe, this need libclang10 above or GLIBC_2.17 above
+let s:enable_ycm = 0
+" 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
+" this need cland10 above or GLIBC_2.18 above for c++
+let s:enable_coc = 1
+" 7. run vim, wait for plugins auto install
+" 8. well done!
 
-
-let s:cpp_clang_highlight = 0
-" check is enable system clipboard
-if has('clipboard') && !empty($DISPLAY)
-    let s:enable_system_clipboard = 1
-else
-    let s:enable_system_clipboard = 0
+if s:enable_coc == 1
+    let s:enable_ycm = 0
 endif
+
 
 " check os
 if !exists("s:os")
@@ -36,12 +36,38 @@ if !exists("s:os")
     endif
 endif
 
-" auto install plugin manager
-if empty(glob('~/.vim/bundle/vundle/autoload/vundle.vim'))
-    silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/vundle
-    "autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-    "call InstallAirLineFont()
-endif
+
+" install font for builty_vim
+function! InstallAirLineFont()
+    let s:usr_font_path = $HOME . '/.local/share/fonts/custom/Droid Sans Mono for Powerline Nerd Font Complete.otf'
+    if s:os == "Darwin" "mac
+        let s:system_font_path = '/Library/Fonts/Droid Sans Mono for Powerline Nerd Font Complete.otf'
+    elseif s:os == "Linux"
+        let s:system_font_path = '/usr/share/fonts/custom/Droid Sans Mono for Powerline Nerd Font Complete.otf'
+        "elseif s:os == "Windows"
+    endif
+
+    if exists("s:builty_vim") && s:builty_vim == 1
+                \ && !filereadable(s:usr_font_path)
+        execute '!curl -fLo ' . shellescape(s:usr_font_path) . ' --create-dirs ' . 'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid\%20Sans\%20Mono\%20Nerd\%20Font\%20Complete.otf'
+        if !filereadable(s:system_font_path) && filereadable(s:usr_font_path)
+            execute '!sudo mkdir `dirname ' . shellescape(s:system_font_path) . '` && sudo cp ' . shellescape(s:usr_font_path) . ' ' . shellescape(s:system_font_path)
+        endif
+    endif
+endfunction
+
+command! -nargs=0 InstallAirLineFont :call InstallAirLineFont()
+
+
+
+" check is enable system clipboard
+"if has('clipboard') && !empty($DISPLAY)
+"    let s:enable_system_clipboard = 1
+"else
+"    let s:enable_system_clipboard = 0
+"endif
+"let s:cpp_clang_highlight = 0
+
 
 let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
 let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
@@ -51,24 +77,41 @@ endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"使用vundle管理vim插件
+"使用vim-plug管理vim插件
+" auto install plugin manager
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set rtp+=~/.vim/bundle/vundle/
-"call vundle#rc()
-call vundle#begin()
+if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
+    "silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && ln -s ~/.vim/bundle/vim-plug  ~/.vim/bundle/vim-plug/autoload 
+    augroup vim-plug_
+        autocmd!
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
+    call InstallAirLineFont()
+endif
+
+"if empty(glob('~/.vim/bundle/vundle/autoload/vundle.vim'))
+"    silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/vundle
+"endif
+"set rtp+=~/.vim/bundle/vundle/
+set rtp+=~/.vim/bundle/vim-plug/
+"
+call plug#begin('~/.vim/bundle')
 if count(g:bundle_groups, 'base')
-    Bundle 'gmarik/vundle'
-    Bundle 'godlygeek/tabular'          
-    Bundle 'majutsushi/tagbar'
-    Bundle 'scrooloose/nerdtree'                 
-    Bundle 'Auto-Pairs'
-    Bundle 'tomasr/molokai'
-    Bundle 'AndrewRadev/splitjoin.vim'
-    Bundle 'SirVer/ultisnips'
-"#    Bundle 'Shougo/echodoc.vim'
-    Bundle 'easymotion/vim-easymotion'
-    Bundle 'terryma/vim-multiple-cursors'
-    Bundle 'ianva/vim-youdao-translater'
+    Plug 'junegunn/vim-plug'
+    "Plug 'gmarik/vundle'
+    Plug 'godlygeek/tabular'          
+    Plug 'majutsushi/tagbar'
+    Plug 'scrooloose/nerdtree'                 
+    "Plug 'Auto-Pairs'
+    Plug 'tomasr/molokai'
+    Plug 'AndrewRadev/splitjoin.vim'
+    Plug 'SirVer/ultisnips'
+"#    Plug 'Shougo/echodoc.vim'
+    Plug 'easymotion/vim-easymotion'
+    Plug 'terryma/vim-multiple-cursors'
+    Plug 'ianva/vim-youdao-translater'
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
 endif
 
 let s:is_system_clang = 0
@@ -79,83 +122,92 @@ if s:os == "Linux"
         let s:is_system_clang = 1
     endif
 endif
+
 " powerful code-completion engine
-if exists("s:enable_ycm")  && s:enable_ycm == 1
-    Bundle 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-    if s:is_system_clang
-        Bundle 'ycm-core/YouCompleteMe', { 'do': './install.py --clang-completer --system-libclang --java-completer' }
-    else
-        Bundle 'ycm-core/YouCompleteMe', { 'do': ' git submodule update --init --recursive && ./install.py --clang-completer --java-completer' }
-    endif
-endif
+function! BuildYCM(info)
+  " info is a dictionary with 3 fields
+  " - name:   name of the plugin
+  " - status: 'installed', 'updated', or 'unchanged'
+  " - force:  set on PlugInstall! or PlugUpdate!
+  if a:info.status == 'installed' || a:info.force
+    "!git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --system-libclang --java-completer
+    !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --java-completer
+  endif
+endfunction
+
+
+"if exists("s:enable_ycm")  && s:enable_ycm == 1
+"    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+"    Plug 'ycm-core/YouCompleteMe', { 'do': function('BuildYCM') }
+"endif
 
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
     " async generate and update ctags/gtags
-    Bundle 'ludovicchabant/vim-gutentags'
-    " Bundle 'skywind3000/gutentags_plus'
-    Bundle 'TC500/gutentags_plus'
+    Plug 'ludovicchabant/vim-gutentags'
+    " Plug 'skywind3000/gutentags_plus'
+    Plug 'TC500/gutentags_plus'
 endif
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
     " switching between companion source files (e.g. .h and .cpp)
-    Bundle 'derekwyatt/vim-fswitch'
+    Plug 'derekwyatt/vim-fswitch'
 endif
 
 if count(g:bundle_groups, 'cpp')
     " cpp highlight
     if exists("s:cpp_clang_highlight")  && s:cpp_clang_highlight == 1
         if s:is_system_clang
-            Bundle 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake -DDOWNLOAD_CLANG=0 ~/.vim/bundle/color_coded/ && make && make install'}
+            Plug 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake -DDOWNLOAD_CLANG=0 ~/.vim/bundle/color_coded/ && make && make install'}
         else
-            Bundle 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake ~/.vim/bundle/color_coded/ && make && make install'}
+            Plug 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake ~/.vim/bundle/color_coded/ && make && make install'}
         endif
     else
-        Bundle 'bfrg/vim-cpp-modern'
+        Plug 'bfrg/vim-cpp-modern'
     endif
 endif
 
 
 if count(g:bundle_groups, 'python')
     " PyLint, Rope, Pydoc, breakpoints from box
-    Bundle 'python-mode/python-mode'
+    Plug 'python-mode/python-mode'
 endif
 
 if count(g:bundle_groups, 'golang')
-    Bundle 'fatih/vim-go'
+    Plug 'fatih/vim-go'
 endif
 
 if count(g:bundle_groups, 'html')
     " emmet
-    Bundle 'mattn/emmet-vim'
+    Plug 'mattn/emmet-vim'
     " html hilight
-    Bundle 'othree/html5.vim'
+    Plug 'othree/html5.vim'
     " always highlights the enclosing html/xml tags
-    Bundle 'Valloric/MatchTagAlways'
+    Plug 'Valloric/MatchTagAlways'
 endif
 
 if count(g:bundle_groups, 'javascript')
     " javascript hilight
-    Bundle 'pangloss/vim-javascript'
+    Plug 'pangloss/vim-javascript'
 endif
 
 
 if count(g:bundle_groups, 'markdown')
     " markdown highlight
-    Bundle 'plasticboy/vim-markdown'
+    Plug 'plasticboy/vim-markdown'
     " markdown preview
-    Bundle 'iamcco/markdown-preview.vim'
+    Plug 'iamcco/markdown-preview.vim'
     " markdown mathjax preview
-    Bundle 'iamcco/mathjax-support-for-mkdp'
+    Plug 'iamcco/mathjax-support-for-mkdp'
 endif
 
 if count(g:bundle_groups, 'json')
     " json highlight
-    Bundle 'elzr/vim-json'
+    Plug 'elzr/vim-json'
 endif
 
 
-call vundle#end()
+call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "使用vundle管理vim插件
@@ -546,8 +598,9 @@ nmap <leader>u :GutentagsUpdate! <CR><CR>
 let mapleader = ","
 if &filetype != 'go'
     "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-    nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
-    nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+    "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
+    "nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
 elseif &filetype == 'go'
     "for golang
     " vim-go custom mappings
@@ -689,3 +742,24 @@ nmap tl :Tlist<cr>
 
 "cs kill 0
 
+
+
+function! s:AddCharOfCursor()
+	let c = col('.')
+	let l = line('.')
+	let l0 = line("'<")
+	let l1 = line("'>")
+	let char0 = strpart(getline('.'),c-1,1)
+	for k in range(1, l1-l0) "从第2行开始
+		let str_before = strpart(getline(l+k),0,c-1)
+		let str_after = strpart(getline(l+k),c)
+		if char0 =~ '\d'
+			let char1 = char0 + k
+		else
+			let char1 = nr2char(char2nr(char0)+k)
+		endif
+		call setline(l+k, str_before . char1 . str_after)
+	endfor
+endfunction
+
+vnoremap <F3> :<C-u>call <SID>AddCharOfCursor()<CR>
