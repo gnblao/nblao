@@ -1,7 +1,9 @@
 " 1. put this file in location ~/.vimrc
-" 2. install cmake and gcc
+" 2. install cmake and gcc   (fedroa sudo dnf install cmake gcc-c++ make python3-devel
 " 3. custom plugin bundle groups
-"   c/cpp require install cscope clang-format GNU-global
+"   ctags (https://github.com/universal-ctags/ctags.git
+"   gtags-ctags GNU-global (sudo dnf install global-ctags
+"   c/cpp require install cscope clang-format
 "   java/c/cpp/scala/python require install GNU-global and https://github.com/yoshizow/global-pygments-plugin
 "   scala require pip install websocket-client sexpdata
 "   scala require sbt
@@ -15,10 +17,10 @@ endif
 " the font will auto install when vim first running
 let s:builty_vim = 1
 " 5. is enable YouCompleteMe, this need libclang10 above or GLIBC_2.17 above
-let s:enable_ycm = 0
+let s:enable_ycm = 1
 " 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
 " this need cland10 above or GLIBC_2.18 above for c++
-let s:enable_coc = 1
+let s:enable_coc = 0
 " 7. run vim, wait for plugins auto install
 " 8. well done!
 
@@ -90,16 +92,11 @@ if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
     call InstallAirLineFont()
 endif
 
-"if empty(glob('~/.vim/bundle/vundle/autoload/vundle.vim'))
-"    silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/vundle
-"endif
-"set rtp+=~/.vim/bundle/vundle/
 set rtp+=~/.vim/bundle/vim-plug/
 "
 call plug#begin('~/.vim/bundle')
 if count(g:bundle_groups, 'base')
     Plug 'junegunn/vim-plug'
-    "Plug 'gmarik/vundle'
     Plug 'godlygeek/tabular'          
     Plug 'majutsushi/tagbar'
     Plug 'scrooloose/nerdtree'                 
@@ -108,16 +105,21 @@ if count(g:bundle_groups, 'base')
     Plug 'AndrewRadev/splitjoin.vim'
     Plug 'SirVer/ultisnips'
 "#    Plug 'Shougo/echodoc.vim'
-    Plug 'easymotion/vim-easymotion'
+    "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'ianva/vim-youdao-translater'
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+    " file header, like author license etc.
+    "Plug 'alpertuna/vim-header'
+    if s:enable_coc == 1
+        Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    endif
 endif
 
 let s:is_system_clang = 0
 if s:os == "Linux"
     let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
-    let s:is_libclang7_install+=str2nr(system('strings `ldconfig -p | grep "libclang.so$" | awk -F" "' . " '" . '{print $NF}'. "'" . '` | grep "version [789].[0-9].[0-9]" | wc -l'))
+    let s:is_libclang7_install+=str2nr(system('realpath `ldconfig -p | grep "libclang.so$" |awk "{print $NF}"` | awk -F"." "{print $NF}"'))
     if s:is_libclang7_install > 0
         let s:is_system_clang = 1
     endif
@@ -130,23 +132,25 @@ function! BuildYCM(info)
   " - status: 'installed', 'updated', or 'unchanged'
   " - force:  set on PlugInstall! or PlugUpdate!
   if a:info.status == 'installed' || a:info.force
-    "!git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --system-libclang --java-completer
-    !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --java-completer
+      if s:is_system_clang == 1
+          !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --system-libclang --java-completer
+      else 
+          !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --java-completer
   endif
 endfunction
 
 
-"if exists("s:enable_ycm")  && s:enable_ycm == 1
-"    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-"    Plug 'ycm-core/YouCompleteMe', { 'do': function('BuildYCM') }
-"endif
+if exists("s:enable_ycm")  && s:enable_ycm == 1
+    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+    Plug 'ycm-core/YouCompleteMe', { 'do': function('BuildYCM') }
+endif
 
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
     " async generate and update ctags/gtags
     Plug 'ludovicchabant/vim-gutentags'
-    " Plug 'skywind3000/gutentags_plus'
-    Plug 'TC500/gutentags_plus'
+    Plug 'skywind3000/gutentags_plus'
+    "Plug 'TC500/gutentags_plus'
 endif
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
@@ -343,7 +347,110 @@ if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
     " These keywords start an extra indent in the next line when 'smartindent' or 'cindent' is set
     set cinwords+=if,else,while,do,for,switch,case,try,catch
 endif
-"""""""""""""""""""""""""""""""""""""""set"""""""""""""""""""""""""""""""""""""""""""""""""
+
+"ctag gtag cscope  cstags.... 
+set cscopetag                  " 使用 cscope 作为 tags 命令
+set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
+
+let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
+let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
+if s:is_universal_ctags > 1
+    let s:is_exuberant_ctags = 0
+endif
+
+
+" for tagbar
+if s:is_exuberant_ctags > 0
+    nmap <F8> :TagbarToggle<CR>
+    let g:tagbar_map_showproto = "<leader><leader>"
+    let g:tagbar_map_togglesort = "<leader>s"
+    let g:tagbar_width = 30
+    let g:tagbar_autofocus = 0
+    let g:tagbar_autoshowtag = 1
+    " open tagbar if ext match
+    if !&diff
+        augroup tagbar_
+            autocmd!
+            autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
+        augroup END
+    endif
+endif
+
+" for vista
+"if s:is_universal_ctags > 0
+"    nmap <F8> :Vista!!<CR>
+"    let g:vista_default_executive = 'ctags'
+"    let g:vista_sidebar_width = 30
+"    " not move to the vista window when it is opened
+"    let g:vista_stay_on_open = 0
+"    let vista_update_on_text_changed = 1
+"    augroup vista_
+"        autocmd!
+"        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+"    augroup END
+"endif
+
+let g:gutentags_trace = 0
+" gutentags_plus
+" disable default keymap
+let g:gutentags_plus_nomap = 1
+" auto switch to quickfix window
+let g:gutentags_plus_switch = 1
+" auto close quickfix if press <CR>
+let g:gutentags_plus_auto_close_list = 0
+" find this symbol
+noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+" find this definition
+noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+" find functions calling this function
+noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+" find this text string
+noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+" find this egrep pattern
+noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+" find this file
+noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+" find files #including this file
+noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+" find functions called by this function
+noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+" find places where this symbol is assigned a value
+noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+
+
+
+" gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
+"let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+let g:gutentags_project_root = ['.root', '.git']
+" 所生成的数据文件的名称
+let g:gutentags_ctags_tagfile = '.tags'
+" 同时开启 ctags 和 gtags 支持：
+let g:gutentags_modules = []
+if executable('gtags-cscope') && executable('gtags')
+	let g:gutentags_modules += ['gtags_cscope']
+endif
+if executable('ctags')
+	let g:gutentags_modules += ['ctags']
+endif
+" 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+let g:gutentags_cache_dir = expand('~/.cache/tags')
+" 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
+if s:is_universal_ctags > 0
+    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extra=+qf']
+else
+    let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+endif 
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+" 如果使用 universal ctags 需要增加下面一行，老的 Exuberant-ctags 不能加下一行
+if s:is_universal_ctags > 0
+    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
+endif
+" 禁用 gutentags 自动加载 gtags 数据库的行为
+let g:gutentags_auto_add_gtags_cscope = 0
+" force update tags file
+let g:gutentags_define_advanced_commands = 1
+nmap <leader>u :GutentagsUpdate! <CR><CR>
 
 
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
@@ -473,7 +580,7 @@ if exists("s:enable_ycm")  && s:enable_ycm == 1
     if !empty(glob(".ycm_extra_conf.py"))
         let g:ycm_global_ycm_extra_conf = ".ycm_extra_conf.py"
     endif
-    let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
+    "let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
     " autoload .ycm_extra_conf.py, no need confirm
     let g:ycm_confirm_extra_conf=0
     let g:ycm_complete_in_comments=1
@@ -511,89 +618,7 @@ if exists("s:enable_ycm")  && s:enable_ycm == 1
     let g:SuperTabDefaultCompletionType = '<C-n>'
 endif  "s:enable_ycm
 
-" gutentags_plus
-" disable default keymap
-let g:gutentags_plus_nomap = 1
-" auto switch to quickfix window
-let g:gutentags_plus_switch = 1
-" auto close quickfix if press <CR>
-let g:gutentags_plus_auto_close_list = 0
-" find this symbol
-noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-" find this definition
-noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-" find functions calling this function
-noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-" find this text string
-noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-" find this egrep pattern
-noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-" find this file
-noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-" find files #including this file
-noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-" find functions called by this function
-noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-" find places where this symbol is assigned a value
-noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-" project root dir flag contant .root and .git
-let g:gutentags_project_root = ['.root']
-" Specifies a directory in which to create all the tags files, instead of writing them at the root of each project
-let g:gutentags_cache_dir = expand('~/.cache/tags')
-let g:gutentags_resolve_symlinks = 1
-let g:gutentags_modules = []
-if executable('gtags') && executable('gtags-cscope')
-    " gtags first
-    let g:gutentags_modules += ['gtags_cscope']
-elseif executable('ctags')
-    " then ctags
-    let g:gutentags_modules += ['ctags']
-endif
-let g:gutentags_ctags_tagfile = '.tags'
-let g:gutentags_ctags_extra_args = []
-let g:gutentags_ctags_extra_args += ['--fields=+niaztKS', '--extra=+qf']
-let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-" disable gutentags auto load, gutentags_plus plugin handles switching databases automatically before performing a query
-let g:gutentags_auto_add_gtags_cscope = 0
-" force update tags file
-let g:gutentags_define_advanced_commands = 1
-nmap <leader>u :GutentagsUpdate! <CR><CR>
 
-
-"""""""""" Vim自动补全神器：YouCompleteMe"""""""""""""""""""""""
-" 这个leader就映射为逗号“，”
-"let mapleader ="," 
-"let g:ycm_server_use_vim_stdout = 0
-"let g:ycm_server_keep_logfiles = 0
-"let g:ycm_server_log_level = 'debug'
-""打开vim时不再询问是否加载ycm_extra_conf.py配置
-"let g:ycm_confirm_extra_conf = 0
-"let g:ycm_error_symbol = '>>'
-"let g:ycm_warning_symbol = '>*'
-"let g:ycm_collect_identifiers_from_tags_files = 1
-"let g:ycm_collect_identifiers_from_comments_and_strings = 1
-"let g:ycm_key_list_select_completion = ['<C-TAB>', '<Down>']
-"let g:ycm_key_list_previous_completion = ['<C-S-TAB>','<Up>']
-"let g:ycm_key_list_select_completion = ['', '']
-"let g:ycm_key_list_previous_completion = ['','']
-"let g:ycm_seed_identifiers_with_syntax = 1
-"let g:ycm_key_invoke_completion = '<leader><tab>'
-"let g:ycm_semantic_triggers =  {
-"            \   'c' : ['->', '.', 're!(?=[a-zA-Z_])'],
-"            \   'objc' : ['->', '.'],
-"            \   'ocaml' : ['.', '#'],
-"            \   'cpp,objcpp' : ['->', '.', '::'],
-"            \   'perl' : ['->'],
-"            \   'php' : ['->', '::'],
-"            \   'cs,javascript,d,python,perl6,scala,vb,elixir,go' : ['.'],
-"            \   'java,jsp' : ['.'],
-"            \   'vim' : ['re![_a-zA-Z]+[_\w]*\.'],
-"            \   'ruby' : ['.', '::'],
-"            \   'lua' : ['.', ':'],
-"            \   'erlang' : [':'],
-"            \ }
-"""""""end Ycm""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let mapleader = ","
 if &filetype != 'go'
@@ -738,10 +763,6 @@ omap <Leader>f <Plug>(easymotion-bd-f)
 
 nmap tl :Tlist<cr>
 "map lw oBd_Log::warning("***********lw*************".var_export($, true));<ESC>F$1li
-
-
-"cs kill 0
-
 
 
 function! s:AddCharOfCursor()
