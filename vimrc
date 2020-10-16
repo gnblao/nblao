@@ -119,8 +119,8 @@ endif
 let s:is_system_clang = 0
 if s:os == "Linux"
     let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
-    let s:is_libclang7_install+=str2nr(system('realpath `ldconfig -p | grep "libclang.so$" |awk "{print $NF}"` | awk -F"." "{print $NF}"'))
-    if s:is_libclang7_install > 0
+    let s:is_libclang7_install+=str2nr(system('realpath `ldconfig -p | grep "libclang.so$" |awk "{print \\$NF}"` | awk -F"." "{print \\$NF}"'))
+    if s:is_libclang7_install > 6
         let s:is_system_clang = 1
     endif
 endif
