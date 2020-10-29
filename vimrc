@@ -436,7 +436,7 @@ endif
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
 if s:is_universal_ctags > 0
-    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extra=+qf']
+    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extras=+qf']
 else
     let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
 endif 
