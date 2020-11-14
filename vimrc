@@ -149,8 +149,8 @@ endif
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
     " async generate and update ctags/gtags
     Plug 'ludovicchabant/vim-gutentags'
-    Plug 'skywind3000/gutentags_plus'
-    "Plug 'TC500/gutentags_plus'
+    Plug 'TC500/gutentags_plus'
+    "Plug 'skywind3000/gutentags_plus'
 endif
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')

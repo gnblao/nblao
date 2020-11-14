@@ -5,13 +5,10 @@ if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
 
-# User specific aliases and functions
-#export C_INCLUDE_PATH=/env/include
-#export CPLUS_INCLUDE_PATH=/env/include/
-#export LD_LIBRARY_PATH=~/env/lib64:~/env/lib
-
-#export PATH=/env/bin:$PATH
-#export PYTHONPATH=/env/bin:$PYTHONPATH
-#
+#yum install ncurses-term
+if [ "$TERM" == "xterm" ]; then
+	export TERM=xterm-256color
+fi
 
 alias tmux='tmux -2'
+
