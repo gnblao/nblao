@@ -397,7 +397,7 @@ let g:gutentags_plus_nomap = 1
 " auto switch to quickfix window
 let g:gutentags_plus_switch = 1
 " auto close quickfix if press <CR>
-let g:gutentags_plus_auto_close_list = 0
+let g:gutentags_plus_auto_close_list = 1
 " find this symbol
 noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
 " find this definition
