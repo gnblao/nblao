@@ -17,10 +17,10 @@ endif
 " the font will auto install when vim first running
 let s:builty_vim = 1
 " 5. is enable YouCompleteMe, this need libclang10 above or GLIBC_2.17 above
-let s:enable_ycm = 1
+let s:enable_ycm = 0
 " 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
 " this need cland10 above or GLIBC_2.18 above for c++
-let s:enable_coc = 0
+let s:enable_coc = 1
 " 7. run vim, wait for plugins auto install
 " 8. well done!
 
@@ -102,6 +102,7 @@ if count(g:bundle_groups, 'base')
     Plug 'scrooloose/nerdtree'                 
     "Plug 'Auto-Pairs'
     Plug 'tomasr/molokai'
+    Plug 'dracula/vim', { 'as': 'dracula' }
     Plug 'AndrewRadev/splitjoin.vim'
     Plug 'SirVer/ultisnips'
 "#    Plug 'Shougo/echodoc.vim'
@@ -438,7 +439,8 @@ let g:gutentags_cache_dir = expand('~/.cache/tags')
 if s:is_universal_ctags > 0
     let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extras=+qf']
 else
-    let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+    "let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extras=+qf']
 endif 
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
@@ -459,6 +461,10 @@ nmap <leader>u :GutentagsUpdate! <CR><CR>
 let g:molokai_original = 1
 let g:rehash256 = 1
 colorscheme molokai
+" for dracula
+"let g:dracula_italic = 0
+"colorscheme dracula
+
 
 "通过事件设置文件类型
 au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
@@ -669,7 +675,9 @@ let NERDTreeQuitOnOpen=1
 """""""""""""""""""""" nerdtree end """""""""""""""""""""""
 
 """""""""tagbar begin""""""""""""""""""""""""""""""""""
-"当前文件taglist 窗口  
+"当前文件taglist 窗口 
+"let g:tagbar_ctags_bin="/usr/bin/gtags"
+"let g:tagbar_ctags_options='-e'
 map <F7>  :TagbarToggle<CR>
 imap <F7>  <ESC> :TagbarToggle<CR>
 "go的tags窗口也
@@ -784,3 +792,16 @@ function! s:AddCharOfCursor()
 endfunction
 
 vnoremap <F3> :<C-u>call <SID>AddCharOfCursor()<CR>
+
+
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
