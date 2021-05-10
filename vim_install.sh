@@ -13,6 +13,7 @@ mkdir -p  tmp && cd tmp
 #fi
 
 #install llvm clangd (https://llvm.org/docs/GettingStarted.html#checkout)
+#sorece https://mirrors.tuna.tsinghua.edu.cn/help/llvm-project.git/
 #tar -xvf llvm-project-11.0.0.tar.xz
 #cd llvm-project-11.0.0
 #mkdir build
