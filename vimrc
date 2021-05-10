@@ -84,7 +84,7 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
     "silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && ln -s ~/.vim/bundle/vim-plug  ~/.vim/bundle/vim-plug/autoload 
+    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && cd ~/.vim/bundle/vim-plug && ln -s ../vim-plug  autoload 
     augroup vim-plug_
         autocmd!
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
@@ -115,35 +115,6 @@ if count(g:bundle_groups, 'base')
     if s:enable_coc == 1
         Plug 'neoclide/coc.nvim', {'branch': 'release'}
     endif
-endif
-
-let s:is_system_clang = 0
-if s:os == "Linux"
-    let s:is_libclang7_install=str2nr(system('ldconfig -p | grep "libclang-[789].so" | wc -l'))
-    let s:is_libclang7_install+=str2nr(system('realpath `ldconfig -p | grep "libclang.so$" |awk "{print \\$NF}"` | awk -F"." "{print \\$NF}"'))
-    if s:is_libclang7_install > 6
-        let s:is_system_clang = 1
-    endif
-endif
-
-" powerful code-completion engine
-function! BuildYCM(info)
-  " info is a dictionary with 3 fields
-  " - name:   name of the plugin
-  " - status: 'installed', 'updated', or 'unchanged'
-  " - force:  set on PlugInstall! or PlugUpdate!
-  if a:info.status == 'installed' || a:info.force
-      if s:is_system_clang == 1
-          !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --system-libclang --java-completer
-      else 
-          !git submodule update --init --recursive && python3 ./install.py --clangd-completer --clang-completer --java-completer
-  endif
-endfunction
-
-
-if exists("s:enable_ycm")  && s:enable_ycm == 1
-    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-    Plug 'ycm-core/YouCompleteMe', { 'do': function('BuildYCM') }
 endif
 
 
@@ -569,62 +540,6 @@ autocmd BufNewFile * normal G
 " Enable highlighting of named requirements (C++20 library concepts)
 let g:cpp_named_requirements_highlight = 1
 
-" YouCompleteMe
-if exists("s:enable_ycm")  && s:enable_ycm == 1
-    if !empty(glob("~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"))
-        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py"
-    endif
-    if !empty(glob("~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"))
-        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-    endif
-    if !empty(glob("~/.vim/bundle/YouCompleteMe/third_party/ycmd/examples/.ycm_extra_conf.py"))
-        let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/examples/.ycm_extra_conf.py"
-    endif
-    if !empty(glob("~/.vim/.ycm_extra_conf.py"))
-        let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
-    endif
-    if !empty(glob(".ycm_extra_conf.py"))
-        let g:ycm_global_ycm_extra_conf = ".ycm_extra_conf.py"
-    endif
-    "let g:ycm_global_ycm_extra_conf = '~/nblao/ycm_extra_conf.py'  
-    " autoload .ycm_extra_conf.py, no need confirm
-    let g:ycm_confirm_extra_conf=0
-    let g:ycm_complete_in_comments=1
-    let g:ycm_collect_identifiers_from_tags_files=1
-    let g:ycm_min_num_of_chars_for_completion=1
-    let g:ycm_cache_omnifunc=0
-    " YCM's identifier completer will seed its identifier database with the keywords of the programming language
-    let g:ycm_seed_identifiers_with_syntax=1
-    " show the completion menu even when typing inside strings
-    let g:ycm_complete_in_strings = 1
-    " show the completion menu even when typing inside comments
-    let g:ycm_complete_in_comments = 1
-    " eclim file type validate conflict with YouCompleteMe
-    let g:EclimFileTypeValidate = 0
-    " YCM will populate the location list automatically every time it gets new diagnostic data
-    let g:ycm_always_populate_location_list = 1
-    " Let clangd fully control code completion
-    let g:ycm_clangd_uses_ycmd_caching = 0
-
-    augroup ycm_
-        autocmd!
-        " goto next location list
-        " goto previous location list
-        autocmd BufRead,BufNewFile * if count(['cpp','c','python','java','go'], &ft) |
-                    \ nmap <buffer> <C-g> :YcmCompleter GoToDefinitionElseDeclaration <C-R>=expand("<cword>")<CR><CR> |
-                    \ nmap <buffer> <leader>gy :YcmCompleter FixIt<CR> |
-                    \ nnoremap <buffer> <leader>t :YcmCompleter GetType<CR> |
-                    \ nmap <buffer> [l :lnext<CR> |
-                    \ nmap <buffer> ]l :lprevious<CR> | endif
-    augroup END
-    " make YCM compatible with UltiSnips (using supertab)
-    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-    let g:ycm_max_diagnostics_to_display = 0
-    let g:SuperTabDefaultCompletionType = '<C-n>'
-endif  "s:enable_ycm
-
-
 
 let mapleader = ","
 if &filetype != 'go'
@@ -793,7 +708,9 @@ endfunction
 
 vnoremap <F3> :<C-u>call <SID>AddCharOfCursor()<CR>
 
-
+"for JSON compilation database
+"-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+"bear -- <your-build-command>
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
