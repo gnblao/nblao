@@ -16,8 +16,6 @@ endif
 " 4. is enable builty plugin, this require set terminal font to DroidSansMono Nerd\ Font\ 11
 " the font will auto install when vim first running
 let s:builty_vim = 1
-" 5. is enable YouCompleteMe, this need libclang10 above or GLIBC_2.17 above
-let s:enable_ycm = 0
 " 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
 " this need cland10 above or GLIBC_2.18 above for c++
 let s:enable_coc = 1
@@ -69,14 +67,6 @@ command! -nargs=0 InstallAirLineFont :call InstallAirLineFont()
 "    let s:enable_system_clipboard = 0
 "endif
 "let s:cpp_clang_highlight = 0
-
-
-let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
-let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
-if s:is_universal_ctags > 1
-    let s:is_exuberant_ctags = 0
-endif
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "使用vim-plug管理vim插件
@@ -330,7 +320,6 @@ if s:is_universal_ctags > 1
     let s:is_exuberant_ctags = 0
 endif
 
-
 " for tagbar
 if s:is_exuberant_ctags > 0
     nmap <F8> :TagbarToggle<CR>
@@ -362,10 +351,44 @@ endif
 "    augroup END
 "endif
 
+" for debug
 let g:gutentags_trace = 0
+" gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
+"let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+let g:gutentags_project_root = ['.root', '.git']
+" 所生成的数据文件的名称
+let g:gutentags_ctags_tagfile = '.tags'
+" 同时开启 ctags 和 gtags 支持：
+let g:gutentags_modules = []
+if executable('gtags-cscope') && executable('gtags')
+	let g:gutentags_modules += ['gtags_cscope']
+endif
+if executable('ctags')
+	let g:gutentags_modules += ['ctags']
+endif
+" 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+let g:gutentags_cache_dir = expand('~/.cache/tags')
+
+let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+" 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
+if s:is_universal_ctags > 0
+    let g:gutentags_ctags_extra_args += ['--extras=+qf']
+    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
+"else
+"    let g:gutentags_ctags_extra_args = ['--extras=+qf']
+endif 
+
+" 禁用 gutentags 自动加载 gtags 数据库的行为
+let g:gutentags_auto_add_gtags_cscope = 0
+" force update tags file
+let g:gutentags_define_advanced_commands = 1
+nmap <leader>u :GutentagsUpdate! <CR><CR>
+
 " gutentags_plus
 " disable default keymap
-let g:gutentags_plus_nomap = 1
+let g:gutentags_plus_nomap = 0
 " auto switch to quickfix window
 let g:gutentags_plus_switch = 1
 " auto close quickfix if press <CR>
@@ -390,40 +413,6 @@ noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
 noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
 
 
-
-" gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
-"let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
-let g:gutentags_project_root = ['.root', '.git']
-" 所生成的数据文件的名称
-let g:gutentags_ctags_tagfile = '.tags'
-" 同时开启 ctags 和 gtags 支持：
-let g:gutentags_modules = []
-if executable('gtags-cscope') && executable('gtags')
-	let g:gutentags_modules += ['gtags_cscope']
-endif
-if executable('ctags')
-	let g:gutentags_modules += ['ctags']
-endif
-" 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
-let g:gutentags_cache_dir = expand('~/.cache/tags')
-" 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
-if s:is_universal_ctags > 0
-    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extras=+qf']
-else
-    "let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
-    let g:gutentags_ctags_extra_args = ['--fields=+niaztKS', '--extras=+qf']
-endif 
-let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-" 如果使用 universal ctags 需要增加下面一行，老的 Exuberant-ctags 不能加下一行
-if s:is_universal_ctags > 0
-    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-endif
-" 禁用 gutentags 自动加载 gtags 数据库的行为
-let g:gutentags_auto_add_gtags_cscope = 0
-" force update tags file
-let g:gutentags_define_advanced_commands = 1
-nmap <leader>u :GutentagsUpdate! <CR><CR>
 
 
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
@@ -549,10 +538,6 @@ if &filetype != 'go'
 
 elseif &filetype == 'go'
     "for golang
-    " vim-go custom mappings
-    nnoremap <leader>r <Plug>(go-run)
-    nnoremap <leader>b <Plug>(go-build)
-    nnoremap <leader>t <Plug>(go-test)
     nnoremap <leader>c <Plug>(go-coverage)
     nnoremap <Leader>s <Plug>(go-implements)
     nnoremap <Leader>i <Plug>(go-info)
@@ -718,7 +703,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+"nmap <silent> gd <Plug>(coc-definition)
+"nmap <silent> gy <Plug>(coc-type-definition)
+"nmap <silent> gi <Plug>(coc-implementation)
+"nmap <silent> gr <Plug>(coc-references)

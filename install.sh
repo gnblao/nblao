@@ -4,8 +4,9 @@
 #install vim 8+ see vim_install.sh
 
 
-cp -r vimrc ~/.vimrc
-cp -r ./dict ~/.vim/
-cp -r ./bashrc ~/.bashrc
+ln -s `pwd`/vimrc ~/.vimrc
+ln -s `pwd`/gitconfig ~/.gitconfig
+ln -s `pwd`/bashrc ~/.bashrc
 
+cp -r dict ~/.vim/
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
