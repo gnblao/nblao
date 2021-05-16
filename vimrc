@@ -37,28 +37,6 @@ if !exists("s:os")
 endif
 
 
-" install font for builty_vim
-function! InstallAirLineFont()
-    let s:usr_font_path = $HOME . '/.local/share/fonts/custom/Droid Sans Mono for Powerline Nerd Font Complete.otf'
-    if s:os == "Darwin" "mac
-        let s:system_font_path = '/Library/Fonts/Droid Sans Mono for Powerline Nerd Font Complete.otf'
-    elseif s:os == "Linux"
-        let s:system_font_path = '/usr/share/fonts/custom/Droid Sans Mono for Powerline Nerd Font Complete.otf'
-        "elseif s:os == "Windows"
-    endif
-
-    if exists("s:builty_vim") && s:builty_vim == 1
-                \ && !filereadable(s:usr_font_path)
-        execute '!curl -fLo ' . shellescape(s:usr_font_path) . ' --create-dirs ' . 'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid\%20Sans\%20Mono\%20Nerd\%20Font\%20Complete.otf'
-        if !filereadable(s:system_font_path) && filereadable(s:usr_font_path)
-            execute '!sudo mkdir `dirname ' . shellescape(s:system_font_path) . '` && sudo cp ' . shellescape(s:usr_font_path) . ' ' . shellescape(s:system_font_path)
-        endif
-    endif
-endfunction
-
-command! -nargs=0 InstallAirLineFont :call InstallAirLineFont()
-
-
 
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
