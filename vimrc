@@ -2,7 +2,7 @@
 " 2. install cmake and gcc   (fedroa sudo dnf install cmake gcc-c++ make python3-devel
 " 3. custom plugin bundle groups
 "   ctags (https://github.com/universal-ctags/ctags.git
-"   gtags-ctags GNU-global (sudo dnf install global-ctags
+"   gtags-ctags GNU-global (sudo dnf install global-ctags for fedroa
 "   c/cpp require install cscope clang-format
 "   java/c/cpp/scala/python require install GNU-global and https://github.com/yoshizow/global-pygments-plugin
 "   scala require pip install websocket-client sexpdata
@@ -13,18 +13,16 @@ if !exists('g:bundle_groups')
     " let g:bundle_groups=['base', 'python', 'c', 'cpp', 'golang', 'html', 'javascript', 'markdown', 'java', 'json', 'shell', 'protobuf', 'thrift', 'scala']
     let g:bundle_groups=['base', 'python', 'c', 'cpp', 'markdown', 'json', 'shell', 'protobuf', 'thrift', 'scala', 'golang', 'java']
 endif
-" 4. is enable builty plugin, this require set terminal font to DroidSansMono Nerd\ Font\ 11
-" the font will auto install when vim first running
-let s:builty_vim = 1
+" 4. is enable cpp_clang_highlight
+let s:cpp_clang_highlight = 0
+" 5. is enable is_system_clang
+let s:is_system_clang = 1
 " 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
 " this need cland10 above or GLIBC_2.18 above for c++
 let s:enable_coc = 1
+
 " 7. run vim, wait for plugins auto install
 " 8. well done!
-
-if s:enable_coc == 1
-    let s:enable_ycm = 0
-endif
 
 
 " check os
@@ -37,14 +35,12 @@ if !exists("s:os")
 endif
 
 
-
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
 "    let s:enable_system_clipboard = 1
 "else
 "    let s:enable_system_clipboard = 0
 "endif
-"let s:cpp_clang_highlight = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "使用vim-plug管理vim插件
@@ -57,7 +53,6 @@ if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
         autocmd!
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
     augroup END
-    call InstallAirLineFont()
 endif
 
 set rtp+=~/.vim/bundle/vim-plug/
@@ -366,7 +361,7 @@ nmap <leader>u :GutentagsUpdate! <CR><CR>
 
 " gutentags_plus
 " disable default keymap
-let g:gutentags_plus_nomap = 0
+let g:gutentags_plus_nomap = 1
 " auto switch to quickfix window
 let g:gutentags_plus_switch = 1
 " auto close quickfix if press <CR>
@@ -508,7 +503,7 @@ autocmd BufNewFile * normal G
 let g:cpp_named_requirements_highlight = 1
 
 
-let mapleader = ","
+"let mapleader = ","
 if &filetype != 'go'
     "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
     "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
@@ -623,9 +618,10 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
-vnoremap <silent> <C-F> :<C-u>Ydv<CR>
-nnoremap <silent> <C-F> :<C-u>Ydc<CR>
-noremap <leader>yd :<C-u>Yde<CR>
+"vnoremap <silent> <C-F> :<C-u>Ydv<CR>
+"nnoremap <silent> <C-F> :<C-u>Ydc<CR>
+vnoremap <leader>yd :<C-u>Ydv<CR>
+nnoremap <leader>yd :<C-u>Ydc<CR>
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
 "set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
