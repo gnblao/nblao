@@ -1,2 +1,2 @@
-[url "https://hub.fastgit.org"]
-	insteadOf = https://github.com
+#[url "https://hub.fastgit.org"]
+#	insteadOf = https://github.com

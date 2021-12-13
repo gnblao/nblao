@@ -72,6 +72,7 @@ if count(g:bundle_groups, 'base')
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'ianva/vim-youdao-translater'
+    Plug 'rhysd/vim-clang-format'
 
     " file header, like author license etc.
     "Plug 'alpertuna/vim-header'
@@ -113,7 +114,10 @@ if count(g:bundle_groups, 'python')
 endif
 
 if count(g:bundle_groups, 'golang')
-    Plug 'fatih/vim-go'
+    "Plug 'fatih/vim-go'
+    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+    Plug 'dgryski/vim-godef'
+    Plug 'Blackrush/vim-gocode'
 endif
 
 if count(g:bundle_groups, 'html')
@@ -457,7 +461,7 @@ func SetTitle()
     endif
     if expand("%:e") == 'cpp'
         call append(line("$"), "#include<iostream>")
-        call append(line("$"), "using namespace std;")
+        "call append(line("$"), "using namespace std;")
         call append(line("$"), "")
         call append(line("$"), "int main(int argc, char **argv){")
         call append(line("$"), "")
@@ -612,6 +616,14 @@ func CodeFormat()
 endfunc  
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
+
+let g:clang_format#code_style = 'google'
+let g:clang_format#style_options = {
+            \ "AccessModifierOffset" : -4,
+            \ "AlignConsecutiveMacros": "true",
+            \ "AlignConsecutiveAssignments": "(AcrossEmptyLinesAndComments)",
+            \ "AlignConsecutiveDeclarations": "(AcrossEmptyLinesAndComments)"
+            \}
 
 "vnoremap <silent> <C-F> :<C-u>Ydv<CR>
 "nnoremap <silent> <C-F> :<C-u>Ydc<CR>
