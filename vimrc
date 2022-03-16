@@ -71,9 +71,9 @@ if count(g:bundle_groups, 'base')
 "#    Plug 'Shougo/echodoc.vim'
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
-    Plug 'ianva/vim-youdao-translater'
     Plug 'rhysd/vim-clang-format'
 
+    Plug 'bujnlc8/vim-translator'
     " file header, like author license etc.
     "Plug 'alpertuna/vim-header'
     if s:enable_coc == 1
@@ -110,7 +110,7 @@ endif
 
 if count(g:bundle_groups, 'python')
     " PyLint, Rope, Pydoc, breakpoints from box
-    Plug 'python-mode/python-mode'
+    Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
 endif
 
 if count(g:bundle_groups, 'golang')
@@ -625,10 +625,16 @@ let g:clang_format#style_options = {
             \ "AlignConsecutiveDeclarations": "(AcrossEmptyLinesAndComments)"
             \}
 
-"vnoremap <silent> <C-F> :<C-u>Ydv<CR>
-"nnoremap <silent> <C-F> :<C-u>Ydc<CR>
-vnoremap <leader>yd :<C-u>Ydv<CR>
-nnoremap <leader>yd :<C-u>Ydc<CR>
+
+""""""""""""""""""""""vim-translator""""""""""""
+let g:translator_cache=0
+let g:translator_cache_path='~/.cache/vim-translator'
+let g:translator_channel='baidu'      " youdao|baidu   
+let g:translator_outputype='popup'      " popup|echo|
+vnoremap <leader>yd :<C-u>Tv<CR>
+nnoremap <leader>yd :<C-u>Tc<CR>
+
+
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
 "set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
