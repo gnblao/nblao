@@ -66,6 +66,7 @@ if empty(glob('~/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComp
         autocmd VimEnter * call InstallAirLineFont()
     augroup END
 endif
+
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
 "    let s:enable_system_clipboard = 1
@@ -112,7 +113,6 @@ if count(g:bundle_groups, 'base')
 
     " file header, like author license etc.
     "Plug 'alpertuna/vim-header'
-    Plug 'ryanoasis/vim-devicons'    
 endif
 
 if exists("s:enable_coc")  && s:enable_coc == 1
