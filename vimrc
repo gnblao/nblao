@@ -20,9 +20,11 @@ let s:is_system_clang = 1
 " 6. is enable coc.nvim, a LSP intellisense engine, better than ycm
 " this need cland10 above or GLIBC_2.18 above for c++
 let s:enable_coc = 1
-
-" 7. run vim, wait for plugins auto install
-" 8. well done!
+" 7. is enable builty plugin, this require set terminal font to DroidSansMono Nerd\ Font\ 11
+" the font will auto install when vim first running
+let s:builty_vim = 1
+" 8. run vim, wait for plugins auto install
+" 9. well done!
 
 
 " check os
@@ -35,6 +37,35 @@ if !exists("s:os")
 endif
 
 
+" install font for builty_vim
+function! InstallAirLineFont()
+    let s:usr_font_path = $HOME . '/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
+    if s:os == "Darwin" "mac
+        let s:system_font_path = '/Library/Fonts/DroidSansMonoforPowerlineNerdFontComplete.otf'
+    elseif s:os == "Linux"
+        let s:system_font_path = '/usr/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
+        "elseif s:os == "Windows"
+    endif
+
+    if exists("s:builty_vim") && s:builty_vim == 1
+                \ && !filereadable(s:usr_font_path)
+        execute '!curl -fLo ' . s:usr_font_path . ' --create-dirs ' . 'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid\%20Sans\%20Mono\%20Nerd\%20Font\%20Complete.otf'
+        execute '!fc-cache -v'
+        "if !filereadable(s:system_font_path) && filereadable(s:usr_font_path)
+        "    execute '!sudo mkdir `dirname ' . shellescape(s:system_font_path) . '` && sudo cp ' . shellescape(s:usr_font_path) . ' ' . shellescape(s:system_font_path)
+        "endif
+    endif
+endfunction
+if !exists(":InstallAirLineFont")
+    command -nargs=0 InstallAirLineFont :call InstallAirLineFont()
+endif
+
+if empty(glob('~/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'))
+     augroup vim_font_
+        autocmd!
+        autocmd VimEnter * call InstallAirLineFont()
+    augroup END
+endif
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
 "    let s:enable_system_clipboard = 1
@@ -81,7 +112,7 @@ if count(g:bundle_groups, 'base')
 
     " file header, like author license etc.
     "Plug 'alpertuna/vim-header'
-    
+    Plug 'ryanoasis/vim-devicons'    
 endif
 
 if exists("s:enable_coc")  && s:enable_coc == 1
@@ -325,7 +356,8 @@ if s:is_universal_ctags > 0
     let g:vista_sidebar_width = 40
     let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
     let g:vista_close_on_fzf_select = 1 
-
+    let g:vista#renderer#enable_icon = 1
+    
     " not move to the vista window when it is opened
     let g:vista_stay_on_open = 0
     let vista_update_on_text_changed = 1
