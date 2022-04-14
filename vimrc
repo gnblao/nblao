@@ -61,7 +61,10 @@ call plug#begin('~/.vim/bundle')
 if count(g:bundle_groups, 'base')
     Plug 'junegunn/vim-plug'
     Plug 'godlygeek/tabular'          
+    
     Plug 'majutsushi/tagbar'
+    Plug 'liuchengxu/vista.vim'
+    
     Plug 'scrooloose/nerdtree'                 
     "Plug 'Auto-Pairs'
     Plug 'tomasr/molokai'
@@ -74,13 +77,16 @@ if count(g:bundle_groups, 'base')
     Plug 'rhysd/vim-clang-format'
 
     Plug 'bujnlc8/vim-translator'
+    Plug 'tpope/vim-characterize'
+
     " file header, like author license etc.
     "Plug 'alpertuna/vim-header'
-    if s:enable_coc == 1
-        Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    endif
+    
 endif
 
+if exists("s:enable_coc")  && s:enable_coc == 1
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
 
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
     " async generate and update ctags/gtags
@@ -273,6 +279,9 @@ if has("autocmd")
       \| exe "normal g'\"" | endif
 endif
 
+" auto close preview when complete done
+"autocmd CompleteDone * pclose
+
 if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
     " enables automatic C program indenting
     set cindent
@@ -310,18 +319,23 @@ if s:is_exuberant_ctags > 0
 endif
 
 " for vista
-"if s:is_universal_ctags > 0
-"    nmap <F8> :Vista!!<CR>
-"    let g:vista_default_executive = 'ctags'
-"    let g:vista_sidebar_width = 30
-"    " not move to the vista window when it is opened
-"    let g:vista_stay_on_open = 0
-"    let vista_update_on_text_changed = 1
-"    augroup vista_
-"        autocmd!
-"        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
-"    augroup END
-"endif
+if s:is_universal_ctags > 0
+    nmap <F8> :Vista!!<CR>
+    let g:vista_default_executive = 'ctags'
+    let g:vista_sidebar_width = 40
+    let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+    let g:vista_close_on_fzf_select = 1 
+
+    " not move to the vista window when it is opened
+    let g:vista_stay_on_open = 0
+    let vista_update_on_text_changed = 1
+    augroup vista_
+        autocmd!
+        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
+        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
+    augroup END
+endif
 
 " for debug
 let g:gutentags_trace = 0
@@ -341,7 +355,8 @@ endif
 " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 
-let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+"let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+let g:gutentags_ctags_extra_args = ['--fields=+niazS']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
@@ -371,19 +386,102 @@ noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
 noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 " find functions calling this function
 noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-" find this text string
-noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-" find this egrep pattern
+"" find this text string
+"noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+"" find this egrep pattern
 noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-" find this file
-noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-" find files #including this file
-noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-" find functions called by this function
-noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-" find places where this symbol is assigned a value
-noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+"" find this file
+"noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+"" find files #including this file
+"noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+"" find functions called by this function
+"noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+"" find places where this symbol is assigned a value
+"noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
 
+
+""""""""""""""""""""""""""""""""""""""ncoc"""""""""""""""""""""""""""""""""""""""""""""""""
+" coc.nvim
+if exists("s:enable_coc")  && s:enable_coc == 1
+    " Use <c-space> to trigger completion.
+    inoremap <silent><expr> <c-space> coc#refresh()
+    " Use `[g` and `]g` to navigate diagnostics
+    nmap <silent> [g <Plug>(coc-diagnostic-prev)
+    nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+    " GoTo code navigation.
+    nmap <silent> <C-g> <Plug>(coc-definition)
+    nmap <silent> <leader>gd <Plug>(coc-definition)
+    nmap <silent> <leader>gt <Plug>(coc-type-definition)
+    nmap <silent> <leader>gi <Plug>(coc-implementation)
+    nmap <silent> <leader>gr <Plug>(coc-references)
+
+    " Apply AutoFix to problem on the current line.
+    nmap <leader>gy <Plug>(coc-fix-current)
+
+    " Use K to show documentation in preview window.
+    function! s:show_documentation()
+        if (index(['vim','help'], &filetype) >= 0)
+            execute 'h '.expand('<cword>')
+        else
+            call CocActionAsync('doHover')
+        endif
+    endfunction
+    nnoremap <silent> <leader>gh :call <SID>show_documentation()<CR>
+    augroup coc_
+        autocmd!
+        " Highlight the symbol and its references when holding the cursor.
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+        " autocmd CursorHold * silent call CocActionAsync('doHover')
+    augroup END
+	" Show all diagnostics.
+    nnoremap <silent> <leader>ga  :<C-u>CocList diagnostics<cr>
+    " rename the current word in the cursor
+    nmap <leader>gn <Plug>(coc-rename)
+
+    " let g:node_client_debug = 1
+    let g:coc_global_extensions = []
+    "let g:coc_global_extensions += ['coc-ultisnips']
+    let g:coc_global_extensions += ['coc-yaml']
+    let g:coc_global_extensions += ['coc-highlight']
+    let g:coc_global_extensions += ['coc-git']
+    let g:coc_global_extensions += ['coc-vimlsp']
+    let g:coc_global_extensions += ['coc-tsserver']
+    let g:coc_global_extensions += ['coc-sh']
+    let g:coc_global_extensions += ['coc-explorer']
+    call coc#config('explorer.icon.source', 'nvim-web-devicons')
+    if count(g:bundle_groups, 'json')
+        let g:coc_global_extensions += ['coc-json']
+    endif
+    if count(g:bundle_groups, 'java')
+        let g:coc_global_extensions += ['coc-java']
+    endif
+    if count(g:bundle_groups, 'scala')
+        let g:coc_global_extensions += ['coc-metals']
+    endif
+    if count(g:bundle_groups, 'markdown')
+        let g:coc_global_extensions += ['coc-markdownlint']
+    endif
+    if count(g:bundle_groups, 'python')
+        let g:coc_global_extensions += ['coc-pyright']
+        call coc#config('python.pythonPath', '/usr/bin/python3')
+    endif
+    if count(g:bundle_groups, 'golang')
+        let g:coc_global_extensions += ['coc-go']
+    endif
+   if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+        let g:coc_global_extensions += ['coc-clangd']
+        call coc#config('clangd.semanticHighlighting', 1)
+        " call coc#config('clangd.path', '/usr/bin/clangd')
+        " call coc#config('clangd.arguments', ["--background-index","-j=4","--index","-suggest-missing-includes=false"])
+        " call coc#config('coc.preferences', {
+        " \ 'timeout': 1000,
+        " \})
+
+        highlight LspCxxHlGroupMemberVariable ctermfg=LightGray  guifg=LightGray
+    endif
+    let g:SuperTabDefaultCompletionType = '<C-n>'
+endif
 
 
 
@@ -535,23 +633,25 @@ au FileType python set omnifunc=pythoncomplete#Complete
 
 
 """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
-""使用NERDTree插件查看工程文件。设置快捷键，速记：filelist
+""NERDTree
 map <F3> :NERDTreeToggle<CR>
 imap <F3> <ESC> :NERDTreeToggle<CR>
-"设置NERDTree子窗口宽度
 "let NERDTreeWinSize=40
-""设置NERDTree子窗口位置
+"设置NERDTree子窗口位置
 let NERDTreeWinPos="left"
 "设置当打开文件后自动关闭NERDtree窗口
 let NERDTreeQuitOnOpen=1
+
+nmap <F4> <Cmd>CocCommand explorer<CR>
+
 """""""""""""""""""""" nerdtree end """""""""""""""""""""""
 
 """""""""tagbar begin""""""""""""""""""""""""""""""""""
 "当前文件taglist 窗口 
 "let g:tagbar_ctags_bin="/usr/bin/gtags"
 "let g:tagbar_ctags_options='-e'
-map <F7>  :TagbarToggle<CR>
-imap <F7>  <ESC> :TagbarToggle<CR>
+map <F7>  :TagbarToggle <CR>
+imap <F7>  <ESC> :TagbarToggle <CR>
 "go的tags窗口也
 "go的跳转
 let g:godef_split=2
@@ -629,7 +729,7 @@ let g:clang_format#style_options = {
 """"""""""""""""""""""vim-translator""""""""""""
 let g:translator_cache=0
 let g:translator_cache_path='~/.cache/vim-translator'
-let g:translator_channel='baidu'      " youdao|baidu   
+let g:translator_channel='youdao'      " youdao|baidu   
 let g:translator_outputype='popup'      " popup|echo|
 vnoremap <leader>yd :<C-u>Tv<CR>
 nnoremap <leader>yd :<C-u>Tc<CR>
@@ -684,13 +784,9 @@ vnoremap <F3> :<C-u>call <SID>AddCharOfCursor()<CR>
 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 "bear -- <your-build-command>
 
-" Use `[g` and `]g` to navigate diagnostics
-" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-" GoTo code navigation.
-"nmap <silent> gd <Plug>(coc-definition)
-"nmap <silent> gy <Plug>(coc-type-definition)
-"nmap <silent> gi <Plug>(coc-implementation)
-"nmap <silent> gr <Plug>(coc-references)
+" INSERT mode
+"let &t_SI = "\<Esc>[2 q" . "\<Esc>]12;yellow\x7"
+" REPLACE mode
+"let &t_SR = "\<Esc>[3 q" . "\<Esc>]12;black\x7"
+" NORMAL mode
+"let &t_EI = "\<Esc>[2 q" . "\<Esc>]12;green\x7"
