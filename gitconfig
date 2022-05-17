@@ -1,2 +1,4 @@
 #[url "https://hub.fastgit.org"]
 #	insteadOf = https://github.com
+#[https]
+#	sslVerify = false

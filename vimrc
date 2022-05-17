@@ -63,7 +63,7 @@ endif
 if empty(glob('~/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'))
      augroup vim_font_
         autocmd!
-        autocmd VimEnter * call InstallAirLineFont()
+        "autocmd VimEnter * call InstallAirLineFont()
     augroup END
 endif
 
@@ -93,8 +93,9 @@ call plug#begin('~/.vim/bundle')
 if count(g:bundle_groups, 'base')
     Plug 'junegunn/vim-plug'
     Plug 'godlygeek/tabular'          
-    
-    Plug 'majutsushi/tagbar'
+   
+    Plug 'preservim/tagbar'
+    "Plug 'majutsushi/tagbar'
     Plug 'liuchengxu/vista.vim'
     
     Plug 'scrooloose/nerdtree'                 
@@ -354,20 +355,25 @@ if s:is_universal_ctags > 0
     nmap <F8> :Vista!!<CR>
     let g:vista_default_executive = 'ctags'
     let g:vista_sidebar_width = 40
-    let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+    "let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
     let g:vista_close_on_fzf_select = 1 
-    let g:vista#renderer#enable_icon = 1
-    
+   
+    let g:vista#renderer#enable_icon = 0
     " not move to the vista window when it is opened
     let g:vista_stay_on_open = 0
     let vista_update_on_text_changed = 1
+    "let g:vista_ctags_cmd = {
+    "            \ 'haskell': 'hasktags -x -o - -c',
+    "            \ 'cpp': 'ctags --fields=+niaztkS --c-kinds=+px --c++-kinds=+px',
+    "            \ }
     augroup vista_
         autocmd!
-        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
-        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
+        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
         autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
     augroup END
 endif
+
 
 " for debug
 let g:gutentags_trace = 0
@@ -387,16 +393,14 @@ endif
 " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 
-"let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
-let g:gutentags_ctags_extra_args = ['--fields=+niazS']
+let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+"let g:gutentags_ctags_extra_args = ['--fields=+niazS']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
 if s:is_universal_ctags > 0
-    let g:gutentags_ctags_extra_args += ['--extras=+qf']
     let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-"else
-"    let g:gutentags_ctags_extra_args = ['--extras=+qf']
+    let g:gutentags_ctags_extra_args = ['--extras=+qf']
 endif 
 
 " 禁用 gutentags 自动加载 gtags 数据库的行为
@@ -516,7 +520,6 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 endif
 
 
-
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
 
 " 设置背景主题     
@@ -583,8 +586,8 @@ func SetTitle()
     else 
         call setline(1, "/*************************************************************************") 
         call append(line("$"), "    > File Name: ".expand("%")) 
-        call append(line("$"), "    > Author: ") 
-        call append(line("$"), "    > Mail: ") 
+        call append(line("$"), "    > Author: gnblao") 
+        call append(line("$"), "    > Mail: gnbalo") 
         call append(line("$"), "    > Created Time: ".strftime("%c")) 
         call append(line("$"), " ************************************************************************/") 
         call append(line("$"), "")
