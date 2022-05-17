@@ -103,8 +103,8 @@ if count(g:bundle_groups, 'base')
     Plug 'tomasr/molokai'
     Plug 'dracula/vim', { 'as': 'dracula' }
     Plug 'AndrewRadev/splitjoin.vim'
-    Plug 'SirVer/ultisnips'
-"#    Plug 'Shougo/echodoc.vim'
+"    Plug 'SirVer/ultisnips'
+"    Plug 'Shougo/echodoc.vim'
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'rhysd/vim-clang-format'
@@ -191,6 +191,7 @@ endif
 call plug#end()
 
 " -encode set begin-
+set modifiable
 set encoding=utf-8
 set termencoding=utf-8
 set fileencoding=utf-8
