@@ -9,8 +9,24 @@ ln -s `pwd`/tmux.conf ~/.tmux.conf
 ln -s `pwd`/global.rc ~/.global.rc
 
 #cp -r dict ~/.vim/
+# tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
+if read -p "tmux prefix is C-a? [y/n]:" read_flg
+then
+    if [ "$read_flg" == "y" ]; then
+		sed -i -e '1s/.*\(unbind C-b\)/\1/g' ./tmux.conf
+		sed -i -e '2s/.*\(set -g prefix C-a\)/\1/g' ./tmux.conf
+	else
+		sed -i -e '1s/.*\(unbind C-b\)/#\1/g' ./tmux.conf
+		sed -i -e '2s/.*\(set -g prefix C-a\)/#\1/g' ./tmux.conf
+	fi
+else
+    echo "\n抱歉，你输入超时了。"
+fi
+
+
+# shell
 if [ "/bin/bash" == "$SHELL" ]; then
     shrc_path="$HOME/.bashrc"
     my_bashrc="my_bashrc"
@@ -20,7 +36,7 @@ if [ "/bin/bash" == "$SHELL" ]; then
     if [ $flg -eq 0 ]; then
         echo '. '"`pwd`/$my_bashrc" >> $shrc_path
     else
-        sed -i "/.*\/$my_bashrc/d" $shrc_path &&  echo '. '"`pwd`/$my_bashrc" >> $shrc_path
+        sed -i -e "/.*\/$my_bashrc/d" $shrc_path &&  echo '. '"`pwd`/$my_bashrc" >> $shrc_path
     fi
 fi
 
@@ -32,6 +48,6 @@ if [ "/bin/zsh" == "$SHELL" ]; then
     if [ $flg -eq 0 ]; then
         echo '. '"`pwd`/$my_zshrc" >> $shrc_path
     else
-        sed -i '' "/.*\/$my_zshrc/d" $shrc_path &&  echo '. '"`pwd`/$my_zshrc" >> $shrc_path
+        sed -i -e "/.*\/$my_zshrc/d" $shrc_path &&  echo '. '"`pwd`/$my_zshrc" >> $shrc_path
     fi
 fi
