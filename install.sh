@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #install vim 8+ see vim_install.sh
 set +x
 
@@ -13,16 +12,25 @@ ln -s `pwd`/global.rc ~/.global.rc
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 if [ "/bin/bash" == "$SHELL" ]; then
-    ln -s `pwd`/bashrc ~/.bashrc
+    shrc_path="~/.bashrc"
+    $my_bashrc="my_bashrc"
+    
+    flg=`grep "$my_bashrc" $(shrc_path) | wc -l`
+    if [ $flg -eq 0 ]; then
+        echo '. '"`pwd`/$my_bashrc" >> $(shrc_path)
+    else
+        sed -i '' "/.*\/$my_bashrc/d" $(shrc_path) &&  echo '. '"`pwd`/$my_bashrc" >> $(shrc_path)
+    fi
 fi
 
 if [ "/bin/zsh" == "$SHELL" ]; then
-    ln -s `pwd`/zshrc ~/.zshrc
-    
-    flg=`grep 'my_zshrc.sh' $(pwd)/zshrc | wc -l`
+    shrc_path="~/.zshrc"
+    $my_zshrc="my_zshrc"
+
+    flg=`grep "$my_zshrc" $(shrc_path) | wc -l`
     if [ $flg -eq 0 ]; then
-        echo '. '"`pwd`/my_zshrc.sh" >> $(pwd)/zshrc
+        echo '. '"`pwd`/$my_zshrc" >> $(shrc_path)
     else
-        sed -i '' '/.*\/my_zshrc.sh/d' $(pwd)/zshrc &&  echo '. '"`pwd`/my_zshrc.sh" >> $(pwd)/zshrc
+        sed -i '' "/.*\/$my_zshrc/d" $(shrc_path) &&  echo '. '"`pwd`/$my_zshrc" >> $(shrc_path)
     fi
 fi
