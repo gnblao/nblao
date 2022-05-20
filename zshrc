@@ -1,7 +1,8 @@
 
 function SET_PROXY() {
     #export http_proxy=sock5://127.0.0.1:1086
-    export http_proxy=http://192.168.124.20:1087
+    export http_proxy=http://127.0.0.1:1087
+#    export http_proxy=http://192.168.124.20:1087
     export https_proxy=$http_proxy
 }
 
@@ -30,11 +31,13 @@ export CLICOLOR_FORCE=1
 if [ -d "$HOME/.oh-my-zsh" ]; then
 
     if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && p10k configure
     fi
 
     ZSH_THEME="powerlevel10k/powerlevel10k"
     export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+else
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
 

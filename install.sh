@@ -38,6 +38,7 @@ if [ "/bin/bash" == "$SHELL" ]; then
     else
         sed -i -e "/.*\/$my_bashrc/d" $shrc_path &&  echo '. '"`pwd`/$my_bashrc" >> $shrc_path
     fi
+    #sudo dnf install powerline-fonts
 fi
 
 if [ "/bin/zsh" == "$SHELL" ]; then
@@ -50,4 +51,8 @@ if [ "/bin/zsh" == "$SHELL" ]; then
     else
         sed -i -e "/.*\/$my_zshrc/d" $shrc_path &&  echo '. '"`pwd`/$my_zshrc" >> $shrc_path
     fi
+    
+    wget https://raw.githubusercontent.com/powerline/fonts/master/SourceCodePro/Source%20Code%20Pro%20for%20Powerline.otf
+    wget https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Monokai%20Remastered.itermcolors
+    wget https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/GitHub%20Dark.itermcolors
 fi
