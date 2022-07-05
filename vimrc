@@ -336,7 +336,7 @@ endif
 
 " for tagbar
 if s:is_exuberant_ctags > 0
-    nmap <F8> :TagbarToggle<CR>
+    map <F9> :TagbarToggle<CR>
     let g:tagbar_map_showproto = "<leader><leader>"
     let g:tagbar_map_togglesort = "<leader>s"
     let g:tagbar_width = 30
@@ -353,11 +353,11 @@ endif
 
 " for vista
 if s:is_universal_ctags > 0
-    nmap <F8> :Vista!!<CR>
-    let g:vista_default_executive = 'ctags'
+    nmap <F9> :Vista!!<CR>
+    let g:vista_default_executive = 'coc'
     let g:vista_sidebar_width = 40
     "let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
-    let g:vista_close_on_fzf_select = 1 
+    let g:vista_close_on_fzf_select = 0 
    
     let g:vista#renderer#enable_icon = 0
     " not move to the vista window when it is opened
@@ -369,8 +369,8 @@ if s:is_universal_ctags > 0
     "            \ }
     augroup vista_
         autocmd!
-        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
-        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
+        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
         autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
     augroup END
 endif
@@ -736,7 +736,8 @@ func CodeFormat()
                     "执行调用外部程序的命令  
                     "exec "%! astyle -A3Lfpjk3NS"  
                     "exec "%! astyle --style=linux"  
-                    exec "%! astyle --style=google"  
+                    exec "%! astyle --style=allman"  
+                    "exec "%! astyle --style=google"  
           "JAVA源程序  
           elseif &filetype == 'java'  
                     "执行调用外部程序的命令  
@@ -753,14 +754,21 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
-let g:clang_format#code_style = 'google'
-let g:clang_format#style_options = {
-            \ "AccessModifierOffset" : -4,
-            \ "AlignConsecutiveMacros": "true",
-            \ "AlignConsecutiveAssignments": "(AcrossEmptyLinesAndComments)",
-            \ "AlignConsecutiveDeclarations": "(AcrossEmptyLinesAndComments)"
-            \}
-
+"let g:clang_format#code_style = 'google'
+let g:clang_format#code_style = 'Microsoft'
+"let g:clang_format#style_options = {
+"            \ "AccessModifierOffset" : -4,
+"            \ "AlignConsecutiveMacros": "true",
+"            \ "AlignConsecutiveAssignments": "(AcrossEmptyLinesAndComments)",
+"            \ "AlignConsecutiveDeclarations": "(AcrossEmptyLinesAndComments)"
+"            \}
+" map to <Leader>cf in C++ code
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+" if you install vim-operator-user
+autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+" Toggle auto formatting:
+nmap <Leader>C :ClangFormatAutoToggle<CR>
 
 """"""""""""""""""""""vim-translator""""""""""""
 let g:translator_cache=0
