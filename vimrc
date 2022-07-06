@@ -756,12 +756,13 @@ map <F12> <Esc>:call CodeFormat()<CR>
 
 "let g:clang_format#code_style = 'google'
 let g:clang_format#code_style = 'Microsoft'
-"let g:clang_format#style_options = {
-"            \ "AccessModifierOffset" : -4,
-"            \ "AlignConsecutiveMacros": "true",
-"            \ "AlignConsecutiveAssignments": "(AcrossEmptyLinesAndComments)",
-"            \ "AlignConsecutiveDeclarations": "(AcrossEmptyLinesAndComments)"
-"            \}
+let g:clang_format#style_options = {
+            \ "AlignConsecutiveMacros": "true",
+            \ "AlignConsecutiveAssignments": "true",
+            \ "AlignConsecutiveDeclarations": "true",
+            \ "AccessModifierOffset" : -4}
+
+"            \ "ColumnLimit" : 79,
 " map to <Leader>cf in C++ code
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
 autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
