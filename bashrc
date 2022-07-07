@@ -7,8 +7,8 @@ fi
 
 
 function SET_PROXY() {
-    #export http_proxy=sock5://127.0.0.1:1086
-    export http_proxy=http://192.168.124.20:1087
+    #export http_proxy=sock5://192.168.124.9:1080
+    export http_proxy=http://192.168.124.9:1081
     export https_proxy=$http_proxy
 }
 

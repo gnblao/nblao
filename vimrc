@@ -754,15 +754,18 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
+
+let g:clang_format#auto_format = 1
+let g:clang_format#auto_format_on_insert_leave = 1
 "let g:clang_format#code_style = 'google'
 let g:clang_format#code_style = 'Microsoft'
 let g:clang_format#style_options = {
-            \ "AlignConsecutiveMacros": "true",
-            \ "AlignConsecutiveAssignments": "true",
-            \ "AlignConsecutiveDeclarations": "true",
+            \ "ColumnLimit" : 100,
             \ "AccessModifierOffset" : -4}
 
-"            \ "ColumnLimit" : 79,
+"            \ "AlignConsecutiveMacros": "true",
+"            \ "AlignConsecutiveAssignments": "true",
+"            \ "AlignConsecutiveDeclarations": "true",
 " map to <Leader>cf in C++ code
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
 autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
