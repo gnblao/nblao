@@ -509,7 +509,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
    if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
         let g:coc_global_extensions += ['coc-clangd']
         call coc#config('clangd.semanticHighlighting', 1)
-        " call coc#config('clangd.path', '/usr/bin/clangd')
+        " call coc#config('clangd.path', '/home/work/dev_env/bin/clangd')
         " call coc#config('clangd.arguments', ["--background-index","-j=4","--index","-suggest-missing-includes=false"])
         " call coc#config('coc.preferences', {
         " \ 'timeout': 1000,
@@ -517,7 +517,9 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 
         highlight LspCxxHlGroupMemberVariable ctermfg=LightGray  guifg=LightGray
     endif
-    let g:SuperTabDefaultCompletionType = '<C-n>'
+    let g:SuperTabDefaultCompletionType = 'context'
+    "inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
+    inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 endif
 
 
@@ -756,9 +758,10 @@ map <F12> <Esc>:call CodeFormat()<CR>
 
 
 let g:clang_format#auto_format = 1
-let g:clang_format#auto_format_on_insert_leave = 1
+let g:clang_format#auto_format_on_insert_leave = 0
 "let g:clang_format#code_style = 'google'
-let g:clang_format#code_style = 'Microsoft'
+"let g:clang_format#code_style = 'Microsoft'
+let g:clang_format#code_style = 'LLVM'
 let g:clang_format#style_options = {
             \ "ColumnLimit" : 100,
             \ "AccessModifierOffset" : -4}
