@@ -18,16 +18,16 @@ mkdir -p  tmp && cd tmp
 #cd llvm-project-11.0.0
 #mkdir build
 #cd build
-#cmake3 -DLLVM_ENABLE_PROJECTS=clang\;clang-tools-extra  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=~/dev_env ../llvm/ -DCMAKE_BUILD_TYPE=Release
+#cmake3 -DLLVM_ENABLE_PROJECTS=clang\;clang-tools-extra -DLLVM_TARGETS_TO_BUILD=AArch64\;X86 -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=~/dev_env ../llvm/ -DCMAKE_BUILD_TYPE=Release
 #make -j64
  
 
-git clone https://github.com/tmux/tmux.git
-cd tmux && ./autogen.sh && ./configure --prefix=$HOME/env && make install && cd ..
-if [ $? -ne 0  ]; then
-    echo " Install tmux Failed"
-    exit -1
-fi
+#git clone https://github.com/tmux/tmux.git
+#cd tmux && ./autogen.sh && ./configure --prefix=$HOME/dev_env && make install && cd ..
+#if [ $? -ne 0  ]; then
+#    echo " Install tmux Failed"
+#    exit -1
+#fi
 
 sudo yum install -y ruby ruby-devel lua lua-devel luajit \
     luajit-devel ctags git python python-devel \
@@ -37,7 +37,7 @@ sudo yum install -y ruby ruby-devel lua lua-devel luajit \
     perl-ExtUtils-Embed
 
 git clone https://github.com/vim/vim.git
-cd vim  && ./configure --prefix=/home/liwanchuan/dev_env --disable-selinux \
+cd vim  && ./configure --prefix=$HOME/dev_env --disable-selinux \
     --enable-luainterp=yes \
     -enable-perlinterp=yes \
     --enable-python3interp=yes \
