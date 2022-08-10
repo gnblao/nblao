@@ -346,7 +346,7 @@ if s:is_exuberant_ctags > 0
     if !&diff
         augroup tagbar_
             autocmd!
-            autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
+            autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
         augroup END
     endif
 endif
@@ -760,8 +760,8 @@ map <F12> <Esc>:call CodeFormat()<CR>
 let g:clang_format#auto_format = 1
 let g:clang_format#auto_format_on_insert_leave = 0
 "let g:clang_format#code_style = 'google'
-"let g:clang_format#code_style = 'Microsoft'
-let g:clang_format#code_style = 'LLVM'
+let g:clang_format#code_style = 'Microsoft'
+"let g:clang_format#code_style = 'LLVM'
 let g:clang_format#style_options = {
             \ "ColumnLimit" : 100,
             \ "AccessModifierOffset" : -4}
