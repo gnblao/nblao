@@ -340,7 +340,7 @@ if s:is_exuberant_ctags > 0
     let g:tagbar_map_showproto = "<leader><leader>"
     let g:tagbar_map_togglesort = "<leader>s"
     let g:tagbar_width = 30
-    let g:tagbar_autofocus = 0
+    let g:tagbar_autofocus = 1
     let g:tagbar_autoshowtag = 1
     " open tagbar if ext match
     if !&diff
@@ -369,8 +369,8 @@ if s:is_universal_ctags > 0
     "            \ }
     augroup vista_
         autocmd!
-        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista coc| endif
-        autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
+        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
         autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
     augroup END
 endif
@@ -760,10 +760,10 @@ map <F12> <Esc>:call CodeFormat()<CR>
 let g:clang_format#auto_format = 1
 let g:clang_format#auto_format_on_insert_leave = 0
 "let g:clang_format#code_style = 'google'
-let g:clang_format#code_style = 'Microsoft'
-"let g:clang_format#code_style = 'LLVM'
+"let g:clang_format#code_style = 'Microsoft'
+let g:clang_format#code_style = 'LLVM'
 let g:clang_format#style_options = {
-            \ "ColumnLimit" : 100,
+            \ "ColumnLimit" : 79,
             \ "AccessModifierOffset" : -4}
 
 "            \ "AlignConsecutiveMacros": "true",
