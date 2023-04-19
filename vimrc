@@ -56,6 +56,7 @@ function! InstallAirLineFont()
         "endif
     endif
 endfunction
+
 if !exists(":InstallAirLineFont")
     command -nargs=0 InstallAirLineFont :call InstallAirLineFont()
 endif
@@ -73,6 +74,126 @@ endif
 "else
 "    let s:enable_system_clipboard = 0
 "endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"使用vim-plug管理vim插件
+" auto install plugin manager
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
+    "silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && cd ~/.vim/bundle/vim-plug && ln -s ../vim-plug  autoload 
+    augroup vim-plug_
+        autocmd!
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
+endif
+
+set rtp+=~/.vim/bundle/vim-plug/
+"
+call plug#begin('~/.vim/bundle')
+if count(g:bundle_groups, 'base')
+    Plug 'junegunn/vim-plug'
+    Plug 'godlygeek/tabular'          
+   
+    Plug 'preservim/tagbar'
+    "Plug 'majutsushi/tagbar'
+    "Plug 'liuchengxu/vista.vim'
+    Plug 'gnblao/vista.vim'
+    
+    Plug 'scrooloose/nerdtree'                 
+    "Plug 'Auto-Pairs'
+    Plug 'tomasr/molokai'
+    Plug 'dracula/vim', { 'as': 'dracula' }
+    Plug 'AndrewRadev/splitjoin.vim'
+"    Plug 'SirVer/ultisnips'
+"    Plug 'Shougo/echodoc.vim'
+    "Plug 'easymotion/vim-easymotion'
+    Plug 'terryma/vim-multiple-cursors'
+    Plug 'rhysd/vim-clang-format'
+
+    Plug 'bujnlc8/vim-translator'
+    """"""""""""""""""""""vim-translator""""""""""""
+    let g:translator_cache=0
+    let g:translator_cache_path='~/.cache/vim-translator'
+    let g:translator_channel='youdao'      " youdao|baidu   
+    let g:translator_outputype='popup'      " popup|echo|
+    vnoremap <leader>yd :<C-u>Tv<CR>
+    nnoremap <leader>yd :<C-u>Tc<CR>
+
+
+    Plug 'tpope/vim-characterize'
+    " file header, like author license etc.
+    "Plug 'alpertuna/vim-header'
+ 
+    if &filetype =='c' || &filetype == 'cpp' || &filetype == 'java'
+        " async generate and update ctags/gtags
+        Plug 'ludovicchabant/vim-gutentags'
+        Plug 'TC500/gutentags_plus'
+        "Plug 'skywind3000/gutentags_plus'
+    endif
+
+    if &filetype =='c' || &filetype == 'cpp'
+        " switching between companion source files (e.g. .h and .cpp)
+        Plug 'derekwyatt/vim-fswitch'
+    endif
+endif
+
+if exists("s:enable_coc")  && s:enable_coc == 1
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
+
+if count(g:bundle_groups, 'python') && &filetype == 'python'
+    " PyLint, Rope, Pydoc, breakpoints from box
+    Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+
+    " for python
+    au FileType python set omnifunc=pythoncomplete#Complete
+endif
+
+if count(g:bundle_groups, 'golang') && &filetype == 'golang'
+    "Plug 'fatih/vim-go'
+    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+    Plug 'dgryski/vim-godef'
+    Plug 'Blackrush/vim-gocode'
+    "nmap <F4> :YcmDiags<CR>
+    " vim-go settings
+    let g:go_fmt_command = "goimports"
+
+endif
+
+if count(g:bundle_groups, 'html') && &filetype == 'html'
+    " emmet
+    Plug 'mattn/emmet-vim'
+    " html hilight
+    Plug 'othree/html5.vim'
+    " always highlights the enclosing html/xml tags
+    Plug 'Valloric/MatchTagAlways'
+endif
+
+if count(g:bundle_groups, 'javascript') && &filetype == 'javascript'
+    " javascript hilight
+    Plug 'pangloss/vim-javascript'
+endif
+
+
+if count(g:bundle_groups, 'markdown') && &filetype == 'markdown'
+    " markdown highlight
+    Plug 'plasticboy/vim-markdown'
+    " markdown preview
+    Plug 'iamcco/markdown-preview.vim'
+    " markdown mathjax preview
+    Plug 'iamcco/mathjax-support-for-mkdp'
+endif
+
+if count(g:bundle_groups, 'json') && &filetype == 'json'
+    " json highlight
+    Plug 'elzr/vim-json'
+endif
+
+
+call plug#end()
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 " -encode set begin-
 set modifiable
@@ -199,7 +320,7 @@ endif
 " auto close preview when complete done
 "autocmd CompleteDone * pclose
 
-if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+if &filetype =='c' || &filetype == 'cpp'
     " enables automatic C program indenting
     set cindent
     " see :help cinoptions-values
@@ -208,176 +329,158 @@ if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
     set cinwords+=if,else,while,do,for,switch,case,try,catch
 endif
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"使用vim-plug管理vim插件
-" auto install plugin manager
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
-    "silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && cd ~/.vim/bundle/vim-plug && ln -s ../vim-plug  autoload 
-    augroup vim-plug_
+" 设置背景主题     
+let g:molokai_original = 1
+let g:rehash256 = 1
+colorscheme molokai
+" for dracula
+"let g:dracula_italic = 0
+"colorscheme dracula
+
+
+"通过事件设置文件类型
+au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
+au BufRead,BufNewFile *.{py}   set filetype=python
+"au BufRead,BufNewFile *.{go}   set filetype=go
+"au BufRead,BufNewFile *.{js}   set filetype=javascript
+
+"根据文件类型设置词典
+au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
+au FileType css        setlocal dict+=~/.vim/dict/css.dict
+au FileType c          setlocal dict+=~/.vim/dict/c.dict
+au FileType cpp        setlocal dict+=~/.vim/dict/cpp.dict
+au FileType scale      setlocal dict+=~/.vim/dict/scale.dict
+au FileType javascript setlocal dict+=~/.vim/dict/javascript.dict
+au FileType html       setlocal dict+=~/.vim/dict/javascript.dict
+au FileType html       setlocal dict+=~/.vim/dict/css.dict
+
+" quickfix模式
+autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
+
+"ctag gtag cscope  cstags.... 
+set cscopetag                  " 使用 cscope 作为 tags 命令
+set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
+
+let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
+let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
+if s:is_universal_ctags > 0
+    let s:is_exuberant_ctags = 0
+endif
+
+" for tagbar
+if s:is_exuberant_ctags > 0
+    map <F9> :TagbarToggle<CR>
+    let g:tagbar_map_showproto = "<leader><leader>"
+    let g:tagbar_map_togglesort = "<leader>s"
+    let g:tagbar_width = 30
+    let g:tagbar_autofocus = 1
+    let g:tagbar_autoshowtag = 1
+    " open tagbar if ext match
+    if !&diff
+        augroup tagbar_
+            autocmd!
+            autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
+        augroup END
+    endif
+endif
+
+" for vista
+if s:is_universal_ctags > 0
+    nmap <F9> :Vista!!<CR>
+    " for TagbarToggle
+    map <F7>  :TagbarToggle <CR>
+    imap <F7>  <ESC> :TagbarToggle <CR>
+    let g:vista_default_executive = 'coc'
+    let g:vista_executive_for = {
+                \ 'vim': 'vim_lsp',
+                \ 'cpp': 'ctags',
+                \ }
+
+    let g:vista_sidebar_width = 40
+    let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+    let g:vista_close_on_fzf_select = 1 
+   
+    "let g:vista#renderer#ctags = 'kind'
+    let g:vista#renderer#enable_icon = 0
+    " not move to the vista window when it is opened
+    let g:vista_stay_on_open = 0
+    let vista_update_on_text_changed = 1
+    "let g:vista_ctags_cmd = {
+    "            \ 'haskell': 'hasktags -x -o - -c',
+    "            \ 'cpp': 'ctags --fields=+niaztkS --c-kinds=+px --c++-kinds=+px',
+    "            \ }
+    augroup vista_
         autocmd!
-        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+        autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
+        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
     augroup END
 endif
 
-set rtp+=~/.vim/bundle/vim-plug/
-"
-call plug#begin('~/.vim/bundle')
-
-if count(g:bundle_groups, 'base')
-    Plug 'junegunn/vim-plug'
-    Plug 'godlygeek/tabular'          
-   
-    Plug 'preservim/tagbar'
-    "Plug 'majutsushi/tagbar'
-    """""""""tagbar begin""""""""""""""""""""""""""""""""""
-    "ctag gtag cscope  cstags.... 
-    set cscopetag                  " 使用 cscope 作为 tags 命令
-    set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
-
-    let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
-    let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
-    "if s:is_universal_ctags > 1
-    "    let s:is_exuberant_ctags = 0
-    "endif
-
-    "if s:is_exuberant_ctags > 0
-    if s:is_universal_ctags > 0
-        " for tagbar
-        "当前文件taglist 窗口 
-        "let g:tagbar_ctags_bin="/usr/bin/gtags"
-        "let g:tagbar_ctags_options='-e'
-        map <F7>  :TagbarToggle <CR>
-        imap <F7>  <ESC> :TagbarToggle <CR>
-        let g:tagbar_width = 30
-        let g:tagbar_compact = 1
-        let g:tagbar_autofocus = 1
-        let g:tagbar_autoshowtag = 1
-        " open tagbar if ext match
-        if !&diff
-            augroup tagbar_
-                autocmd!
-                autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
-            augroup END
-        endif
-    endif
-
-    "go的tags窗口也
-    "go的跳转
-    "let g:godef_split=2
-    "let g:tagbar_type_go = {                  
-    "            \    'ctagstype' : 'go',
-    "            \    'kinds'     : [
-    "            \        'p:package',
-    "            \        'i:imports:1',
-    "            \        'c:constants',
-    "            \        'v:variables',
-    "            \        't:types',
-    "            \        'n:interfaces',
-    "            \        'w:fields',
-    "            \        'e:embedded',
-    "            \        'm:methods',
-    "            \        'r:constructor',
-    "            \        'f:functions'
-    "            \    ],
-    "            \    'sro' : '.',
-    "            \    'kind2scope' : {
-    "            \        't' : 'ctype',
-    "            \        'n' : 'ntype'
-    "            \    },
-    "            \    'scope2kind' : {
-    "            \        'ctype' : 't',
-    "            \        'ntype' : 'n'
-    "            \    },
-    "            \    'ctagsbin'  : 'gotags',
-    "            \    'ctagsargs' : '-sort -silent'
-    "            \ }
-    """"""""""end tagbar""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-    "Plug 'liuchengxu/vista.vim'
-    "" for vista
-    "if s:is_universal_ctags > 0
-    "    nmap <F9> :Vista!!<CR>
-    "    "let g:vista_default_executive = 'coc'
-    "    let g:vista_default_executive = 'ctags'
-    "    let g:vista_executive_for = {
-    "                \ 'cpp': 'ctags',
-    "                \ 'c': 'coc',
-    "                \ 'go': 'ctags',
-    "                \ }
-    "    let g:vista_sidebar_width = 40
-    "    "let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
-    "    let g:vista_close_on_fzf_select = 0 
-    "   
-    "    let g:vista#renderer#enable_icon = 0
-    "    " not move to the vista window when it is opened
-    "    let g:vista_stay_on_open = 0
-    "    let vista_update_on_text_changed = 1
-    "    let g:vista_ctags_cmd = {
-    "                \ 'haskell': 'hasktags -x -o - -c',
-    "                \ 'go': 'gotags --fields=+niaztkS --c-kinds=+px --c++-kinds=+px',
-    "                \ 'cpp': 'ctags --format=2 --excmd=pattern --fields=+niftkSa --c++-kinds=+px --extras=+F --sort=no --append=no --language-force=c++ --c++-kinds=psvcdefghtmnu  --fields=-PF -f- ',
-    "                \ }
-    "                "\ 'cpp': 'ctags --extras=+F -f - --format=2 --excmd=pattern --fields=nksSafet --sort=no --append=no -V --language-force=c++ --c++-kinds=hdpgetncsufmv',
-    "                "\ 'cpp': 'ctags --format=2 --excmd=pattern --fields=+niztkSa --c++-kinds=+px --extras=+F --sort=no --append=no --language-force=c++ --c++-kinds=psvcdefghtmnu --output-format=json --fields=-PF -f- ',
-    "    augroup vista_
-    "        autocmd!
-    "        autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
-    "        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
-    "        autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
-    "    augroup END
-    "endif
-
-    Plug 'scrooloose/nerdtree'                 
-    """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
-    ""NERDTree
-    map <F3> :NERDTreeToggle<CR>
-    imap <F3> <ESC> :NERDTreeToggle<CR>
-    "let NERDTreeWinSize=40
-    "设置NERDTree子窗口位置
-    let NERDTreeWinPos="left"
-    "设置当打开文件后自动关闭NERDtree窗口
-    let NERDTreeQuitOnOpen=1
-
-    nmap <F4> <Cmd>CocCommand explorer<CR>
-    """""""""""""""""""""" nerdtree end """""""""""""""""""""""
-
-
-
-    "Plug 'Auto-Pairs'
-    Plug 'tomasr/molokai'
-    Plug 'dracula/vim', { 'as': 'dracula' }
-    Plug 'AndrewRadev/splitjoin.vim'
-    Plug 'SirVer/ultisnips'
-"    Plug 'Shougo/echodoc.vim'
-    "Plug 'easymotion/vim-easymotion'
-    Plug 'terryma/vim-multiple-cursors'
-    Plug 'rhysd/vim-clang-format'
-
-    Plug 'bujnlc8/vim-translator'
-    Plug 'tpope/vim-characterize'
-
-    " file header, like author license etc.
-    "Plug 'alpertuna/vim-header'
-    
-    Plug 'dense-analysis/neural'
-    Plug 'muniftanjim/nui.nvim'
-    Plug 'elpiloto/significant.nvim'
-    " plugin conf for neural
-    let g:neural = {
-                \   'source': {
-                \       'openai': {
-                \           'api_key': '',
-                \       },
-                \   },
-                \}
-
-
+" for debug
+let g:gutentags_trace = 0
+" gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
+"let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+let g:gutentags_project_root = ['.root', '.git']
+" 所生成的数据文件的名称
+let g:gutentags_ctags_tagfile = '.tags'
+" 同时开启 ctags 和 gtags 支持：
+let g:gutentags_modules = []
+if executable('gtags-cscope') && executable('gtags')
+	let g:gutentags_modules += ['gtags_cscope']
 endif
+if executable('ctags')
+	let g:gutentags_modules += ['ctags']
+endif
+" 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+let g:gutentags_cache_dir = expand('~/.cache/tags')
 
+let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+"let g:gutentags_ctags_extra_args = ['--fields=+niazS']
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+" 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
+if s:is_universal_ctags > 0
+    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
+    let g:gutentags_ctags_extra_args = ['--extras=+qf']
+endif 
+
+" 禁用 gutentags 自动加载 gtags 数据库的行为
+let g:gutentags_auto_add_gtags_cscope = 1
+" force update tags file
+let g:gutentags_define_advanced_commands = 1
+nmap <leader>u :GutentagsUpdate! <CR><CR>
+
+" gutentags_plus
+" disable default keymap
+let g:gutentags_plus_nomap = 1
+" auto switch to quickfix window
+let g:gutentags_plus_switch = 0
+" auto close quickfix if press <CR>
+let g:gutentags_plus_auto_close_list = 1
+" find this symbol
+noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+" find this definition
+noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+" find functions calling this function
+noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+"" find this text string
+"noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+"" find this egrep pattern
+noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+"" find this file
+"noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+"" find files #including this file
+"noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+"" find functions called by this function
+"noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+"" find places where this symbol is assigned a value
+"noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+
+
+""""""""""""""""""""""""""""""""""""""ncoc"""""""""""""""""""""""""""""""""""""""""""""""""
+" coc.nvim
 if exists("s:enable_coc")  && s:enable_coc == 1
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
     " Use <c-space> to trigger completion.
     inoremap <silent><expr> <c-space> coc#refresh()
     " Use `[g` and `]g` to navigate diagnostics
@@ -424,29 +527,29 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     let g:coc_global_extensions += ['coc-tsserver']
     let g:coc_global_extensions += ['coc-sh']
     let g:coc_global_extensions += ['coc-explorer']
-    "call coc#config('explorer.icon.source', 'nvim-web-devicons')
-    if count(g:bundle_groups, 'json')
+    call coc#config('explorer.icon.source', 'nvim-web-devicons')
+    if &filetype == 'json'
         let g:coc_global_extensions += ['coc-json']
     endif
-    if count(g:bundle_groups, 'java')
+    if &filetype == 'java'
         let g:coc_global_extensions += ['coc-java']
     endif
-    if count(g:bundle_groups, 'scala')
+    if &filetype == 'scala'
         let g:coc_global_extensions += ['coc-metals']
     endif
-    if count(g:bundle_groups, 'markdown')
+    if &filetype == 'markdown'
         let g:coc_global_extensions += ['coc-markdownlint']
     endif
-    if count(g:bundle_groups, 'python')
+    if &filetype == 'python'
         let g:coc_global_extensions += ['coc-pyright']
-        "call coc#config('python.pythonPath', '/usr/bin/python3')
+        call coc#config('python.pythonPath', '/usr/bin/python3')
     endif
-    if count(g:bundle_groups, 'golang')
+    if &filetype == 'golang'
         let g:coc_global_extensions += ['coc-go']
     endif
-   if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
+   if &filetype == 'c' || &filetype == 'cpp'
         let g:coc_global_extensions += ['coc-clangd']
-        "call coc#config('clangd.semanticHighlighting', 1)
+        call coc#config('clangd.semanticHighlighting', 1)
         " call coc#config('clangd.path', '/home/work/dev_env/bin/clangd')
         " call coc#config('clangd.arguments', ["--background-index","-j=4","--index","-suggest-missing-includes=false"])
         " call coc#config('coc.preferences', {
@@ -458,170 +561,10 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     let g:SuperTabDefaultCompletionType = 'context'
     "inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
     inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-    
-    autocmd FileType python let b:coc_root_patterns = ['.git', '.env', '.root']
 endif
 
-if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp') || count(g:bundle_groups, 'java')
-    " async generate and update ctags/gtags
-    Plug 'ludovicchabant/vim-gutentags'
-        " for debug
-    let g:gutentags_trace = 0
-    " gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
-    "let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
-    let g:gutentags_project_root = ['.root', '.git']
-    " 所生成的数据文件的名称
-    let g:gutentags_ctags_tagfile = '.tags'
-    " 同时开启 ctags 和 gtags 支持：
-    let g:gutentags_modules = []
-    if executable('gtags-cscope') && executable('gtags')
-        let g:gutentags_modules += ['gtags_cscope']
-    endif
-    if executable('ctags')
-        let g:gutentags_modules += ['ctags']
-    endif
-    " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
-    let g:gutentags_cache_dir = expand('~/.cache/tags')
-
-    let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
-    "let g:gutentags_ctags_extra_args = ['--fields=+niazS']
-    let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-    let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-    " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
-    if s:is_universal_ctags > 0
-        let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-        let g:gutentags_ctags_extra_args = ['--extras=+qf']
-    endif 
-
-    " 禁用 gutentags 自动加载 gtags 数据库的行为
-    let g:gutentags_auto_add_gtags_cscope = 0
-    " force update tags file
-    let g:gutentags_define_advanced_commands = 1
-    nmap <leader>u :GutentagsUpdate! <CR><CR>
-
-    Plug 'TC500/gutentags_plus'
-    "Plug 'skywind3000/gutentags_plus'
-    " disable default keymap
-    let g:gutentags_plus_nomap = 1
-    " auto switch to quickfix window
-    let g:gutentags_plus_switch = 1
-    " auto close quickfix if press <CR>
-    let g:gutentags_plus_auto_close_list = 1
-    " find this symbol
-    noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-    " find this definition
-    noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-    " find functions calling this function
-    noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-    "" find this text string
-    "noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-    "" find this egrep pattern
-    noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-    "" find this file
-    "noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-    "" find files #including this file
-    "noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-    "" find functions called by this function
-    "noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-    "" find places where this symbol is assigned a value
-    "noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-endif
-
-if count(g:bundle_groups, 'c') || count(g:bundle_groups, 'cpp')
-    " switching between companion source files (e.g. .h and .cpp)
-    Plug 'derekwyatt/vim-fswitch'
-endif
-
-if count(g:bundle_groups, 'cpp')
-    " cpp highlight
-    if exists("s:cpp_clang_highlight")  && s:cpp_clang_highlight == 1
-        if s:is_system_clang
-            Plug 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake -DDOWNLOAD_CLANG=0 ~/.vim/bundle/color_coded/ && make && make install'}
-        else
-            Plug 'jeaye/color_coded', {'do': 'dir=`mktemp -d` && cd $dir && cmake ~/.vim/bundle/color_coded/ && make && make install'}
-        endif
-    else
-        Plug 'bfrg/vim-cpp-modern'
-    endif
-endif
-
-
-"if count(g:bundle_groups, 'python')
-"    " PyLint, Rope, Pydoc, breakpoints from box
-"    Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
-"endif
-
-if count(g:bundle_groups, 'golang')
-    "Plug 'fatih/vim-go'
-    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-    Plug 'dgryski/vim-godef'
-    Plug 'Blackrush/vim-gocode'
-endif
-
-if count(g:bundle_groups, 'html')
-    " emmet
-    Plug 'mattn/emmet-vim'
-    " html hilight
-    Plug 'othree/html5.vim'
-    " always highlights the enclosing html/xml tags
-    Plug 'Valloric/MatchTagAlways'
-endif
-
-if count(g:bundle_groups, 'javascript')
-    " javascript hilight
-    Plug 'pangloss/vim-javascript'
-endif
-
-
-if count(g:bundle_groups, 'markdown')
-    " markdown highlight
-    Plug 'plasticboy/vim-markdown'
-    " markdown preview
-    Plug 'iamcco/markdown-preview.vim'
-    " markdown mathjax preview
-    Plug 'iamcco/mathjax-support-for-mkdp'
-endif
-
-if count(g:bundle_groups, 'json')
-    " json highlight
-    Plug 'elzr/vim-json'
-endif
-
-
-call plug#end()
-
-
-""""""""""""""""""""""""""""""""""""""ncoc"""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
-
-" 设置背景主题     
-let g:molokai_original = 1
-let g:rehash256 = 1
-colorscheme molokai
-" for dracula
-"let g:dracula_italic = 0
-"colorscheme dracula
-
-
-"通过事件设置文件类型
-au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
-au BufRead,BufNewFile *.{py}   set filetype=python
-"au BufRead,BufNewFile *.{go}   set filetype=go
-"au BufRead,BufNewFile *.{js}   set filetype=javascript
-
-"根据文件类型设置词典
-au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
-au FileType css        setlocal dict+=~/.vim/dict/css.dict
-au FileType c          setlocal dict+=~/.vim/dict/c.dict
-au FileType cpp        setlocal dict+=~/.vim/dict/cpp.dict
-au FileType scale      setlocal dict+=~/.vim/dict/scale.dict
-au FileType javascript setlocal dict+=~/.vim/dict/javascript.dict
-au FileType html       setlocal dict+=~/.vim/dict/javascript.dict
-au FileType html       setlocal dict+=~/.vim/dict/css.dict
-
-" quickfix模式
-autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 
 """"begin根据文件类型插入内容""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call SetTitle()" 
@@ -699,46 +642,88 @@ func SetTitle()
         call append(line(".")+7,"")
     endif
 endfunc 
+
+
 "新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
 """"end根据文件类型插入内容"""""
 
-" vim-cpp-modern
-" Enable highlighting of named requirements (C++20 library concepts)
-let g:cpp_named_requirements_highlight = 1
+
+"let mapleader = ","
+if &filetype != 'go'
+    "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
+    "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
+    "nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+elseif &filetype == 'go'
+    "for golang
+    nnoremap <leader>c <Plug>(go-coverage)
+    nnoremap <Leader>s <Plug>(go-implements)
+    nnoremap <Leader>i <Plug>(go-info)
+    nnoremap <Leader>e <Plug>(go-rename)
+    
+    nnoremap <Leader>gd <Plug>(go-def)
+    nnoremap <Leader>gs <Plug>(go-def-split)
+    nnoremap <Leader>gv <Plug>(go-def-vertical)
+    nnoremap <Leader>gt <Plug>(go-def-tab)
+    " k=wiki
+    nnoremap <Leader>kd <Plug>(go-doc)
+    nnoremap <Leader>kv <Plug>(go-doc-vertical)
+    nnoremap <Leader>kb <Plug>(go-doc-browser)
+    
+endif
 
 
-""let mapleader = ","
-"if &filetype != 'go'
-"    "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-"    "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
-"    "nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
-"
-"elseif &filetype == 'go'
-"    "for golang
-"    nnoremap <leader>c <Plug>(go-coverage)
-"    nnoremap <Leader>s <Plug>(go-implements)
-"    nnoremap <Leader>i <Plug>(go-info)
-"    nnoremap <Leader>e <Plug>(go-rename)
-"    
-"    nnoremap <Leader>gd <Plug>(go-def)
-"    nnoremap <Leader>gs <Plug>(go-def-split)
-"    nnoremap <Leader>gv <Plug>(go-def-vertical)
-"    nnoremap <Leader>gt <Plug>(go-def-tab)
-"    " k=wiki
-"    nnoremap <Leader>kd <Plug>(go-doc)
-"    nnoremap <Leader>kv <Plug>(go-doc-vertical)
-"    nnoremap <Leader>kb <Plug>(go-doc-browser)
-"    
-"endif
-"
-""nmap <F4> :YcmDiags<CR>
-"" vim-go settings
-"let g:go_fmt_command = "goimports"
-"
-"" for python
-"au FileType python set omnifunc=pythoncomplete#Complete
 
+"""""""""""""""""""""" nerdtree begin """""""""""""""""""""""
+""NERDTree
+map <F3> :NERDTreeToggle<CR>
+imap <F3> <ESC> :NERDTreeToggle<CR>
+"let NERDTreeWinSize=40
+"设置NERDTree子窗口位置
+let NERDTreeWinPos="left"
+"设置当打开文件后自动关闭NERDtree窗口
+let NERDTreeQuitOnOpen=1
+
+nmap <F4> <Cmd>CocCommand explorer<CR>
+
+"""""""""""""""""""""" nerdtree end """""""""""""""""""""""
+
+"""""""""tagbar begin""""""""""""""""""""""""""""""""""
+"当前文件taglist 窗口 
+"let g:tagbar_ctags_bin="/usr/bin/gtags"
+"let g:tagbar_ctags_options='-e'
+"go的tags窗口也
+"go的跳转
+let g:godef_split=2
+let g:tagbar_type_go = {                  
+			\    'ctagstype' : 'go',
+			\    'kinds'     : [
+			\        'p:package',
+			\        'i:imports:1',
+			\        'c:constants',
+			\        'v:variables',
+			\        't:types',
+            \        'n:interfaces',
+            \        'w:fields',
+            \        'e:embedded',
+            \        'm:methods',
+            \        'r:constructor',
+            \        'f:functions'
+            \    ],
+            \    'sro' : '.',
+            \    'kind2scope' : {
+            \        't' : 'ctype',
+            \        'n' : 'ntype'
+            \    },
+            \    'scope2kind' : {
+            \        'ctype' : 't',
+            \        'ntype' : 'n'
+            \    },
+            \    'ctagsbin'  : 'gotags',
+            \    'ctagsargs' : '-sort -silent'
+            \ }
+""""""""""end tagbar""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
 " for style
@@ -775,13 +760,13 @@ endfunc
 map <F12> <Esc>:call CodeFormat()<CR>  
 
 
-let g:clang_format#auto_format = 0
+let g:clang_format#auto_format = 1
 let g:clang_format#auto_format_on_insert_leave = 0
 "let g:clang_format#code_style = 'google'
 "let g:clang_format#code_style = 'Microsoft'
 let g:clang_format#code_style = 'LLVM'
 let g:clang_format#style_options = {
-            \ "ColumnLimit" : 99,
+            \ "ColumnLimit" : 79,
             \ "AccessModifierOffset" : -4}
 
 "            \ "AlignConsecutiveMacros": "true",
@@ -794,14 +779,6 @@ autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
 autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 " Toggle auto formatting:
 nmap <Leader>C :ClangFormatAutoToggle<CR>
-
-""""""""""""""""""""""vim-translator""""""""""""
-let g:translator_cache=0
-let g:translator_cache_path='~/.cache/vim-translator'
-let g:translator_channel='youdao'      " youdao|baidu   
-let g:translator_outputype='popup'      " popup|echo|
-vnoremap <leader>yd :<C-u>Tv<CR>
-nnoremap <leader>yd :<C-u>Tc<CR>
 
 
 
