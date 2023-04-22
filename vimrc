@@ -95,8 +95,8 @@ if count(g:bundle_groups, 'base')
     Plug 'junegunn/vim-plug'
     Plug 'godlygeek/tabular'          
    
-    Plug 'preservim/tagbar'
     "Plug 'majutsushi/tagbar'
+    Plug 'preservim/tagbar'
     "Plug 'liuchengxu/vista.vim'
     Plug 'gnblao/vista.vim'
     
@@ -104,15 +104,15 @@ if count(g:bundle_groups, 'base')
     "Plug 'Auto-Pairs'
     Plug 'tomasr/molokai'
     Plug 'dracula/vim', { 'as': 'dracula' }
+    
     Plug 'AndrewRadev/splitjoin.vim'
-"    Plug 'SirVer/ultisnips'
-"    Plug 'Shougo/echodoc.vim'
+    Plug 'SirVer/ultisnips'
+    Plug 'Shougo/echodoc.vim'
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'rhysd/vim-clang-format'
 
     Plug 'bujnlc8/vim-translator'
-    """"""""""""""""""""""vim-translator""""""""""""
     let g:translator_cache=0
     let g:translator_cache_path='~/.cache/vim-translator'
     let g:translator_channel='youdao'      " youdao|baidu   
@@ -120,12 +120,16 @@ if count(g:bundle_groups, 'base')
     vnoremap <leader>yd :<C-u>Tv<CR>
     nnoremap <leader>yd :<C-u>Tc<CR>
 
-
     Plug 'tpope/vim-characterize'
     " file header, like author license etc.
-    "Plug 'alpertuna/vim-header'
- 
-    if &filetype =='c' || &filetype == 'cpp' || &filetype == 'java'
+	Plug 'alpertuna/vim-header'
+	let g:header_field_author = 'gnblao'
+	let g:header_field_author_email = 'gnblao'
+	let g:header_auto_add_header = 0
+    let g:header_auto_update_header = 1
+    map <F5> :AddHeader<CR> 
+
+	if &filetype =='c' || &filetype == 'cpp' || &filetype == 'java'
         " async generate and update ctags/gtags
         Plug 'ludovicchabant/vim-gutentags'
         Plug 'TC500/gutentags_plus'
@@ -135,6 +139,8 @@ if count(g:bundle_groups, 'base')
     if &filetype =='c' || &filetype == 'cpp'
         " switching between companion source files (e.g. .h and .cpp)
         Plug 'derekwyatt/vim-fswitch'
+        " c/cpp hilight
+        Plug 'bfrg/vim-cpp-modern'
     endif
 endif
 
@@ -155,10 +161,8 @@ if count(g:bundle_groups, 'golang') && &filetype == 'golang'
     Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
     Plug 'dgryski/vim-godef'
     Plug 'Blackrush/vim-gocode'
-    "nmap <F4> :YcmDiags<CR>
     " vim-go settings
     let g:go_fmt_command = "goimports"
-
 endif
 
 if count(g:bundle_groups, 'html') && &filetype == 'html'
@@ -175,7 +179,6 @@ if count(g:bundle_groups, 'javascript') && &filetype == 'javascript'
     Plug 'pangloss/vim-javascript'
 endif
 
-
 if count(g:bundle_groups, 'markdown') && &filetype == 'markdown'
     " markdown highlight
     Plug 'plasticboy/vim-markdown'
@@ -190,10 +193,15 @@ if count(g:bundle_groups, 'json') && &filetype == 'json'
     Plug 'elzr/vim-json'
 endif
 
-
 call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
+" 设置背景主题     
+let g:molokai_original = 1
+let g:rehash256 = 1
+colorscheme molokai
+" for dracula
+"let g:dracula_italic = 0
+"colorscheme dracula
 
 " -encode set begin-
 set modifiable
@@ -312,11 +320,6 @@ filetype indent on           " 针对不同的文件类型采用不同的缩进�
 filetype plugin on           " 针对不同的文件类型加载对应的插件
 filetype plugin indent on    " 启用自动补全
 
-if has("autocmd")
-   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-      \| exe "normal g'\"" | endif
-endif
-
 " auto close preview when complete done
 "autocmd CompleteDone * pclose
 
@@ -328,15 +331,6 @@ if &filetype =='c' || &filetype == 'cpp'
     " These keywords start an extra indent in the next line when 'smartindent' or 'cindent' is set
     set cinwords+=if,else,while,do,for,switch,case,try,catch
 endif
-
-" 设置背景主题     
-let g:molokai_original = 1
-let g:rehash256 = 1
-colorscheme molokai
-" for dracula
-"let g:dracula_italic = 0
-"colorscheme dracula
-
 
 "通过事件设置文件类型
 au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
@@ -390,10 +384,12 @@ if s:is_universal_ctags > 0
     " for TagbarToggle
     map <F7>  :TagbarToggle <CR>
     imap <F7>  <ESC> :TagbarToggle <CR>
-    let g:vista_default_executive = 'coc'
+    "let g:vista_log_file = '/tmp/vista.log'
+    let g:vista_default_executive = 'coc' "ctags |vim_lsp',
     let g:vista_executive_for = {
-                \ 'vim': 'vim_lsp',
                 \ 'cpp': 'ctags',
+                \ 'c': 'ctags',
+                \ 'go': 'ctags',
                 \ }
 
     let g:vista_sidebar_width = 40
@@ -411,9 +407,11 @@ if s:is_universal_ctags > 0
     "            \ }
     augroup vista_
         autocmd!
-        autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
-        "autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
-        autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
+        "autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
+        ""autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
+        "autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
+        autocmd BufReadPost *  Vista!!
+        autocmd QuitPre *  Vista!
     augroup END
 endif
 
@@ -481,43 +479,6 @@ noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
 """"""""""""""""""""""""""""""""""""""ncoc"""""""""""""""""""""""""""""""""""""""""""""""""
 " coc.nvim
 if exists("s:enable_coc")  && s:enable_coc == 1
-    " Use <c-space> to trigger completion.
-    inoremap <silent><expr> <c-space> coc#refresh()
-    " Use `[g` and `]g` to navigate diagnostics
-    nmap <silent> [g <Plug>(coc-diagnostic-prev)
-    nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-    " GoTo code navigation.
-    nmap <silent> <C-g> <Plug>(coc-definition)
-    nmap <silent> <leader>gd <Plug>(coc-definition)
-    nmap <silent> <leader>gt <Plug>(coc-type-definition)
-    nmap <silent> <leader>gi <Plug>(coc-implementation)
-    nmap <silent> <leader>gr <Plug>(coc-references)
-
-    " Apply AutoFix to problem on the current line.
-    nmap <leader>gy <Plug>(coc-fix-current)
-
-    " Use K to show documentation in preview window.
-    function! s:show_documentation()
-        if (index(['vim','help'], &filetype) >= 0)
-            execute 'h '.expand('<cword>')
-        else
-            call CocActionAsync('doHover')
-        endif
-    endfunction
-    nnoremap <silent> <leader>gh :call <SID>show_documentation()<CR>
-    augroup coc_
-        autocmd!
-        " Highlight the symbol and its references when holding the cursor.
-        autocmd CursorHold * silent call CocActionAsync('highlight')
-        " autocmd CursorHold * silent call CocActionAsync('doHover')
-    augroup END
-	" Show all diagnostics.
-    nnoremap <silent> <leader>ga  :<C-u>CocList diagnostics<cr>
-    " rename the current word in the cursor
-    nmap <leader>gn <Plug>(coc-rename)
-
-    " let g:node_client_debug = 1
     let g:coc_global_extensions = []
     "let g:coc_global_extensions += ['coc-ultisnips']
     let g:coc_global_extensions += ['coc-yaml']
@@ -528,6 +489,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     let g:coc_global_extensions += ['coc-sh']
     let g:coc_global_extensions += ['coc-explorer']
     call coc#config('explorer.icon.source', 'nvim-web-devicons')
+    nmap <F4> <Cmd>CocCommand explorer<CR>
     if &filetype == 'json'
         let g:coc_global_extensions += ['coc-json']
     endif
@@ -550,14 +512,54 @@ if exists("s:enable_coc")  && s:enable_coc == 1
    if &filetype == 'c' || &filetype == 'cpp'
         let g:coc_global_extensions += ['coc-clangd']
         call coc#config('clangd.semanticHighlighting', 1)
+        call coc#config('coc.preferences.semanticTokensHighlights', 0)
         " call coc#config('clangd.path', '/home/work/dev_env/bin/clangd')
         " call coc#config('clangd.arguments', ["--background-index","-j=4","--index","-suggest-missing-includes=false"])
         " call coc#config('coc.preferences', {
         " \ 'timeout': 1000,
         " \})
 
-        highlight LspCxxHlGroupMemberVariable ctermfg=LightGray  guifg=LightGray
+        "highlight LspCxxHlGroupMemberVariable ctermfg=LightGray  guifg=LightGray
     endif
+ 
+    " let g:node_client_debug = 1
+    " Use K to show documentation in preview window.
+    function! s:show_documentation()
+        if (index(['vim','help'], &filetype) >= 0)
+            execute 'h '.expand('<cword>')
+        else
+            call CocActionAsync('doHover')
+        endif
+    endfunction
+    call coc#config("highlight.colors.enable", 1)
+    nnoremap <silent> <leader>gh :call <SID>show_documentation()<CR>
+    augroup coc_
+        autocmd!
+        " Highlight the symbol and its references when holding the cursor.
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+        "autocmd CursorHold * silent call CocActionAsync('doHover')
+    augroup END
+	" Show all diagnostics.
+    nnoremap <silent> <leader>ga  :<C-u>CocList diagnostics<cr>
+    " rename the current word in the cursor
+    nmap <leader>gn <Plug>(coc-rename)
+
+    " Use <c-space> to trigger completion.
+    inoremap <silent><expr> <c-space> coc#refresh()
+    " Use `[g` and `]g` to navigate diagnostics
+    nmap <silent> [g <Plug>(coc-diagnostic-prev)
+    nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+    " GoTo code navigation.
+    nmap <silent> <C-g> <Plug>(coc-definition)
+    nmap <silent> <leader>gd <Plug>(coc-definition)
+    nmap <silent> <leader>gt <Plug>(coc-type-definition)
+    nmap <silent> <leader>gi <Plug>(coc-implementation)
+    nmap <silent> <leader>gr <Plug>(coc-references)
+
+    " Apply AutoFix to problem on the current line.
+    nmap <leader>gy <Plug>(coc-fix-current)
+    
     let g:SuperTabDefaultCompletionType = 'context'
     "inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
     inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
@@ -567,50 +569,13 @@ endif
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"begin根据文件类型插入内容""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call SetTitle()" 
 ""定义函数SetTitle，自动插入文件头 
-let g:project_root = "/opt/work/cmap"
-func SetTitle() 
-    if &filetype == 'sh' 
-        call setline(1,"\#!/bin/bash") 
-        call append(line("$"), "") 
-    elseif &filetype == 'python'
-        call setline(1,"#!/usr/bin/env python3")
-        call append(line("$"),"# coding=utf-8")
-        call append(line("$"), "") 
-        call append(line("$"), "") 
-    elseif &filetype == 'ruby'
-        call setline(1,"#!/usr/bin/env ruby")
-        call append(line("$"),"# encoding: utf-8")
-        call append(line("$"), "")
-    elseif &filetype == 'mkd'
-        call setline(1,"<head><meta charset=\"UTF-8\"></head>")
-    elseif &filetype == 'php'
-       call setline(1, "<?php")
-       call append(line("$"), "/*************************************************************************")
-       call append(line("$"), "* $Id$")
-       call append(line("$"), "*************************************************************************/")
-       call append(line("$"), "")
-       call append(line("$"), "")
-       call append(line("$"), "")
-       call append(line("$"), "/**")
-       call append(line("$"), " * @file    : ".expand("%"))
-       call append(line("$"), " * @date    : ".strftime("%c"))
-       call append(line("$"), " * @version :  $Revision$")
-       call append(line("$"), " * @brief   :  ")
-       call append(line("$"), " **/")
-    else 
-        call setline(1, "/*************************************************************************") 
-        call append(line("$"), "    > File Name: ".expand("%")) 
-        call append(line("$"), "    > Author: gnblao") 
-        call append(line("$"), "    > Mail: gnbalo") 
-        call append(line("$"), "    > Created Time: ".strftime("%c")) 
-        call append(line("$"), " ************************************************************************/") 
-        call append(line("$"), "")
-    endif
-    if expand("%:e") == 'cpp'
+let g:project_root = ""
+function! s:SetTitle() abort 
+    if &filetype == 'cpp'
+    "if expand("%:e") == 'cpp'
         call append(line("$"), "#include<iostream>")
-        "call append(line("$"), "using namespace std;")
+        call append(line("$"), "")
         call append(line("$"), "")
         call append(line("$"), "int main(int argc, char **argv){")
         call append(line("$"), "")
@@ -642,38 +607,17 @@ func SetTitle()
         call append(line(".")+7,"")
     endif
 endfunc 
+autocmd BufNewFile *.cc,*.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call s:SetTitle()" 
+""""end根据文件类型插入内容"""""
 
+"jemp pre write pos
+if has("autocmd")
+   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+      \| exe "normal g'\"" | endif
+endif
 
 "新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
-""""end根据文件类型插入内容"""""
-
-
-"let mapleader = ","
-if &filetype != 'go'
-    "nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-    "nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
-    "nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
-
-elseif &filetype == 'go'
-    "for golang
-    nnoremap <leader>c <Plug>(go-coverage)
-    nnoremap <Leader>s <Plug>(go-implements)
-    nnoremap <Leader>i <Plug>(go-info)
-    nnoremap <Leader>e <Plug>(go-rename)
-    
-    nnoremap <Leader>gd <Plug>(go-def)
-    nnoremap <Leader>gs <Plug>(go-def-split)
-    nnoremap <Leader>gv <Plug>(go-def-vertical)
-    nnoremap <Leader>gt <Plug>(go-def-tab)
-    " k=wiki
-    nnoremap <Leader>kd <Plug>(go-doc)
-    nnoremap <Leader>kv <Plug>(go-doc-vertical)
-    nnoremap <Leader>kb <Plug>(go-doc-browser)
-    
-endif
-
-
 
 """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
 ""NERDTree
@@ -682,50 +626,10 @@ imap <F3> <ESC> :NERDTreeToggle<CR>
 "let NERDTreeWinSize=40
 "设置NERDTree子窗口位置
 let NERDTreeWinPos="left"
-"设置当打开文件后自动关闭NERDtree窗口
+"设置当打开文件后自动关闭NERDtre窗口
 let NERDTreeQuitOnOpen=1
 
-nmap <F4> <Cmd>CocCommand explorer<CR>
-
 """""""""""""""""""""" nerdtree end """""""""""""""""""""""
-
-"""""""""tagbar begin""""""""""""""""""""""""""""""""""
-"当前文件taglist 窗口 
-"let g:tagbar_ctags_bin="/usr/bin/gtags"
-"let g:tagbar_ctags_options='-e'
-"go的tags窗口也
-"go的跳转
-let g:godef_split=2
-let g:tagbar_type_go = {                  
-			\    'ctagstype' : 'go',
-			\    'kinds'     : [
-			\        'p:package',
-			\        'i:imports:1',
-			\        'c:constants',
-			\        'v:variables',
-			\        't:types',
-            \        'n:interfaces',
-            \        'w:fields',
-            \        'e:embedded',
-            \        'm:methods',
-            \        'r:constructor',
-            \        'f:functions'
-            \    ],
-            \    'sro' : '.',
-            \    'kind2scope' : {
-            \        't' : 'ctype',
-            \        'n' : 'ntype'
-            \    },
-            \    'scope2kind' : {
-            \        'ctype' : 't',
-            \        'ntype' : 'n'
-            \    },
-            \    'ctagsbin'  : 'gotags',
-            \    'ctagsargs' : '-sort -silent'
-            \ }
-""""""""""end tagbar""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
 " for style
 "调用AStyle程序，进行代码美化  
 func CodeFormat()  
@@ -759,8 +663,7 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
-
-let g:clang_format#auto_format = 1
+let g:clang_format#auto_format = 0
 let g:clang_format#auto_format_on_insert_leave = 0
 "let g:clang_format#code_style = 'google'
 "let g:clang_format#code_style = 'Microsoft'
@@ -779,7 +682,6 @@ autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
 autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 " Toggle auto formatting:
 nmap <Leader>C :ClangFormatAutoToggle<CR>
-
 
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
