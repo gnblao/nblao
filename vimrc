@@ -105,9 +105,9 @@ if count(g:bundle_groups, 'base')
     Plug 'tomasr/molokai'
     Plug 'dracula/vim', { 'as': 'dracula' }
     
-    Plug 'AndrewRadev/splitjoin.vim'
-    Plug 'SirVer/ultisnips'
-    Plug 'Shougo/echodoc.vim'
+    "Plug 'AndrewRadev/splitjoin.vim'
+    "Plug 'SirVer/ultisnips'
+    "Plug 'Shougo/echodoc.vim'
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'rhysd/vim-clang-format'
@@ -373,7 +373,7 @@ if s:is_exuberant_ctags > 0
     if !&diff
         augroup tagbar_
             autocmd!
-            autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | call tagbar#autoopen() | endif
+            autocmd BufReadPost * if count(g:bundle_groups, &ft) | call tagbar#autoopen() | endif
         augroup END
     endif
 endif
@@ -407,11 +407,9 @@ if s:is_universal_ctags > 0
     "            \ }
     augroup vista_
         autocmd!
-        "autocmd BufReadPost * if count(['c','cpp','python','java','scala','go'], &ft) | Vista!! | endif
-        ""autocmd BufEnter * if count(['c','cpp','python','java','scala','go'], &ft) | Vista | endif
-        "autocmd QuitPre * if count(['c','cpp','python','java','scala','go'], &ft) | Vista! | endif
-        autocmd BufReadPost *  Vista!!
-        autocmd QuitPre *  Vista!
+        autocmd BufReadPost * if count(g:bundle_groups, &ft) | Vista!! | endif
+        "autocmd BufEnter * if count(g:bundle_groups, &ft) | Vista | endif
+        autocmd QuitPre * if count(g:bundle_groups, &ft) | Vista! | endif
     augroup END
 endif
 
@@ -433,14 +431,16 @@ endif
 " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 
-let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
-"let g:gutentags_ctags_extra_args = ['--fields=+niazS']
+"let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+let g:gutentags_ctags_extra_args = []
+let g:gutentags_ctags_extra_args += ['--fields=nksSafet']
 let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
 let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
 if s:is_universal_ctags > 0
-    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-    let g:gutentags_ctags_extra_args = ['--extras=+qf']
+    "let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
+    let g:gutentags_ctags_extra_args += ['--output-format=json']
+    let g:gutentags_ctags_extra_args += ['--extras=+qf']
 endif 
 
 " 禁用 gutentags 自动加载 gtags 数据库的行为
@@ -453,7 +453,7 @@ nmap <leader>u :GutentagsUpdate! <CR><CR>
 " disable default keymap
 let g:gutentags_plus_nomap = 1
 " auto switch to quickfix window
-let g:gutentags_plus_switch = 0
+let g:gutentags_plus_switch = 1
 " auto close quickfix if press <CR>
 let g:gutentags_plus_auto_close_list = 1
 " find this symbol
