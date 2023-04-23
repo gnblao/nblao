@@ -31,42 +31,13 @@ let s:builty_vim = 1
 if !exists("s:os")
     if has("win64") || has("win32") || has("win16")
         let s:os = "Windows"
+        set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
     else
+        set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
         let s:os = substitute(system('uname'), '\n', '', '')
     endif
 endif
 
-
-" install font for builty_vim
-function! InstallAirLineFont()
-    let s:usr_font_path = $HOME . '/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
-    if s:os == "Darwin" "mac
-        let s:system_font_path = '/Library/Fonts/DroidSansMonoforPowerlineNerdFontComplete.otf'
-    elseif s:os == "Linux"
-        let s:system_font_path = '/usr/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
-        "elseif s:os == "Windows"
-    endif
-
-    if exists("s:builty_vim") && s:builty_vim == 1
-                \ && !filereadable(s:usr_font_path)
-        execute '!curl -fLo ' . s:usr_font_path . ' --create-dirs ' . 'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid\%20Sans\%20Mono\%20Nerd\%20Font\%20Complete.otf'
-        execute '!fc-cache -v'
-        "if !filereadable(s:system_font_path) && filereadable(s:usr_font_path)
-        "    execute '!sudo mkdir `dirname ' . shellescape(s:system_font_path) . '` && sudo cp ' . shellescape(s:usr_font_path) . ' ' . shellescape(s:system_font_path)
-        "endif
-    endif
-endfunction
-
-if !exists(":InstallAirLineFont")
-    command -nargs=0 InstallAirLineFont :call InstallAirLineFont()
-endif
-
-if empty(glob('~/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'))
-     augroup vim_font_
-        autocmd!
-        "autocmd VimEnter * call InstallAirLineFont()
-    augroup END
-endif
 
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
@@ -174,9 +145,42 @@ if count(g:bundle_groups, 'base')
     "Plug 'AndrewRadev/splitjoin.vim'
     Plug 'SirVer/ultisnips'
     "Plug 'Shougo/echodoc.vim'
+    
     "Plug 'easymotion/vim-easymotion'
+    "" 设置easymotion的触发键
+    "let g:EasyMotion_leader_key = '\'
+    "" 允许设置默认快捷键
+    "let g:EasyMotion_do_mapping = 1
+    "" 智能大小写匹配
+    "let g:EasyMotion_smartcase = 1
+    "" 按回车自动跳到第一个匹配
+    "let g:EasyMotion_enter_jump_first = 1
+    "" s查找字符
+    "nmap <Leader>f <Plug>(easymotion-overwin-f)
+    "xmap <Leader>f <Plug>(easymotion-bd-f)
+    "omap <Leader>f <Plug>(easymotion-bd-f)
+
     Plug 'terryma/vim-multiple-cursors'
     Plug 'rhysd/vim-clang-format'
+    let g:clang_format#auto_format = 0
+    let g:clang_format#auto_format_on_insert_leave = 0
+    "let g:clang_format#code_style = 'google'
+    "let g:clang_format#code_style = 'Microsoft'
+    let g:clang_format#code_style = 'LLVM'
+    let g:clang_format#style_options = {
+                \ "ColumnLimit" : 79,
+                \ "AccessModifierOffset" : -4}
+
+    "            \ "AlignConsecutiveMacros": "true",
+    "            \ "AlignConsecutiveAssignments": "true",
+    "            \ "AlignConsecutiveDeclarations": "true",
+    " map to <Leader>cf in C++ code
+    autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+    autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+    " if you install vim-operator-user
+    autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+    " Toggle auto formatting:
+    nmap <Leader>C :ClangFormatAutoToggle<CR>
 
     Plug 'bujnlc8/vim-translator'
     let g:translator_cache=0
@@ -444,24 +448,8 @@ if &filetype =='c' || &filetype == 'cpp'
     set cinwords+=if,else,while,do,for,switch,case,try,catch
 endif
 
-"通过事件设置文件类型
-au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
-au BufRead,BufNewFile *.{py}   set filetype=python
-"au BufRead,BufNewFile *.{go}   set filetype=go
-"au BufRead,BufNewFile *.{js}   set filetype=javascript
-
-"根据文件类型设置词典
-au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
-au FileType css        setlocal dict+=~/.vim/dict/css.dict
-au FileType c          setlocal dict+=~/.vim/dict/c.dict
-au FileType cpp        setlocal dict+=~/.vim/dict/cpp.dict
-au FileType scale      setlocal dict+=~/.vim/dict/scale.dict
-au FileType javascript setlocal dict+=~/.vim/dict/javascript.dict
-au FileType html       setlocal dict+=~/.vim/dict/javascript.dict
-au FileType html       setlocal dict+=~/.vim/dict/css.dict
-
 " quickfix模式
-autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
+"autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 
 "ctag gtag cscope  cstags.... 
 set cscopetag                  " 使用 cscope 作为 tags 命令
@@ -471,16 +459,26 @@ set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
 " coc.nvim
 if exists("s:enable_coc")  && s:enable_coc == 1
     let g:coc_global_extensions = []
-    "let g:coc_global_extensions += ['coc-ultisnips']
+    let g:coc_global_extensions += ['coc-ultisnips']
     let g:coc_global_extensions += ['coc-yaml']
     let g:coc_global_extensions += ['coc-highlight']
     let g:coc_global_extensions += ['coc-git']
     let g:coc_global_extensions += ['coc-vimlsp']
     let g:coc_global_extensions += ['coc-tsserver']
     let g:coc_global_extensions += ['coc-sh']
+    let g:coc_global_extensions += ['coc-copilot']
+    
     let g:coc_global_extensions += ['coc-explorer']
     call coc#config('explorer.icon.source', 'nvim-web-devicons')
     nmap <F4> <Cmd>CocCommand explorer<CR>
+    
+    let g:coc_global_extensions += ['coc-clang-format-style-options']
+    let g:coc_global_extensions += ['coc-cmake']
+    call coc#config('cmake.cmakePath', 'cmake')
+    
+    if &filetype == 'lua'
+        let g:coc_global_extensions += ['coc-lua']
+    endif
     if &filetype == 'json'
         let g:coc_global_extensions += ['coc-json']
     endif
@@ -694,50 +692,31 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
-let g:clang_format#auto_format = 0
-let g:clang_format#auto_format_on_insert_leave = 0
-"let g:clang_format#code_style = 'google'
-"let g:clang_format#code_style = 'Microsoft'
-let g:clang_format#code_style = 'LLVM'
-let g:clang_format#style_options = {
-            \ "ColumnLimit" : 79,
-            \ "AccessModifierOffset" : -4}
+"通过事件设置文件类型
+"au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
+"au BufRead,BufNewFile *.{py}   set filetype=python
+"au BufRead,BufNewFile *.{go}   set filetype=go
+"au BufRead,BufNewFile *.{js}   set filetype=javascript
 
-"            \ "AlignConsecutiveMacros": "true",
-"            \ "AlignConsecutiveAssignments": "true",
-"            \ "AlignConsecutiveDeclarations": "true",
-" map to <Leader>cf in C++ code
-autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
-" if you install vim-operator-user
-autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
-" Toggle auto formatting:
-nmap <Leader>C :ClangFormatAutoToggle<CR>
+"根据文件类型设置词典
+au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
+au FileType css        setlocal dict+=~/.vim/dict/css.dict
+au FileType c          setlocal dict+=~/.vim/dict/c.dict
+au FileType cpp        setlocal dict+=~/.vim/dict/c.dict
+au FileType cpp        setlocal dict+=~/.vim/dict/cpp.dict
+au FileType scale      setlocal dict+=~/.vim/dict/scale.dict
+au FileType javascript setlocal dict+=~/.vim/dict/javascript.dict
+au FileType html       setlocal dict+=~/.vim/dict/javascript.dict
+au FileType html       setlocal dict+=~/.vim/dict/css.dict
 
 
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
-"set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc,*.png,*.jpg,*.gif  " Windows
 
 let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
 let g:ctrlp_extensions = ['funky']
 
-" 设置easymotion的触发键
-let g:EasyMotion_leader_key = '\'
-" 允许设置默认快捷键
-let g:EasyMotion_do_mapping = 1
-" 智能大小写匹配
-let g:EasyMotion_smartcase = 1
-" 按回车自动跳到第一个匹配
-let g:EasyMotion_enter_jump_first = 1
-" s查找字符
-nmap <Leader>f <Plug>(easymotion-overwin-f)
-xmap <Leader>f <Plug>(easymotion-bd-f)
-omap <Leader>f <Plug>(easymotion-bd-f)
-
 nmap tl :Tlist<cr>
 "map lw oBd_Log::warning("***********lw*************".var_export($, true));<ESC>F$1li
-
 
 function! s:AddCharOfCursor()
 	let c = col('.')
@@ -756,8 +735,38 @@ function! s:AddCharOfCursor()
 		call setline(l+k, str_before . char1 . str_after)
 	endfor
 endfunction
-
 vnoremap <F3> :<C-u>call <SID>AddCharOfCursor()<CR>
+
+" install font for builty_vim
+function! InstallAirLineFont()
+    let s:usr_font_path = $HOME . '/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
+    if s:os == "Darwin" "mac
+        let s:system_font_path = '/Library/Fonts/DroidSansMonoforPowerlineNerdFontComplete.otf'
+    elseif s:os == "Linux"
+        let s:system_font_path = '/usr/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'
+        "elseif s:os == "Windows"
+    endif
+
+    if exists("s:builty_vim") && s:builty_vim == 1
+                \ && !filereadable(s:usr_font_path)
+        execute '!curl -fLo ' . s:usr_font_path . ' --create-dirs ' . 'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid\%20Sans\%20Mono\%20Nerd\%20Font\%20Complete.otf'
+        execute '!fc-cache -v'
+        "if !filereadable(s:system_font_path) && filereadable(s:usr_font_path)
+        "    execute '!sudo mkdir `dirname ' . shellescape(s:system_font_path) . '` && sudo cp ' . shellescape(s:usr_font_path) . ' ' . shellescape(s:system_font_path)
+        "endif
+    endif
+endfunction
+
+if !exists(":InstallAirLineFont")
+    command -nargs=0 InstallAirLineFont :call InstallAirLineFont()
+endif
+
+if empty(glob('~/.local/share/fonts/custom/DroidSansMonoforPowerlineNerdFontComplete.otf'))
+     augroup vim_font_
+        autocmd!
+        "autocmd VimEnter * call InstallAirLineFont()
+    augroup END
+endif
 
 "for JSON compilation database
 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
