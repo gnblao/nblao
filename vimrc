@@ -97,16 +97,82 @@ if count(g:bundle_groups, 'base')
    
     "Plug 'majutsushi/tagbar'
     Plug 'preservim/tagbar'
+    let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
+    let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
+    if s:is_universal_ctags > 0
+        let s:is_exuberant_ctags = 0
+    endif
+
+    " for tagbar
+    if s:is_exuberant_ctags > 0
+        map <F9> :TagbarToggle<CR>
+        let g:tagbar_map_showproto = "<leader><leader>"
+        let g:tagbar_map_togglesort = "<leader>s"
+        let g:tagbar_width = 30
+        let g:tagbar_autofocus = 1
+        let g:tagbar_autoshowtag = 1
+        " open tagbar if ext match
+        if !&diff
+            augroup tagbar_
+                autocmd!
+                autocmd BufReadPost * if count(g:bundle_groups, &ft) | call tagbar#autoopen() | endif
+            augroup END
+        endif
+    endif
+
     "Plug 'liuchengxu/vista.vim'
     Plug 'gnblao/vista.vim'
-    
-    Plug 'scrooloose/nerdtree'                 
+    " for vista
+    if s:is_universal_ctags > 0
+        nmap <F9> :Vista!!<CR>
+        " for TagbarToggle
+        map <F7>  :TagbarToggle <CR>
+        imap <F7>  <ESC> :TagbarToggle <CR>
+        "let g:vista_log_file = '/tmp/vista.log'
+        let g:vista_default_executive = 'coc' "ctags |vim_lsp',
+        let g:vista_executive_for = {
+                    \ 'cpp': 'ctags',
+                    \ 'c': 'ctags',
+                    \ 'go': 'ctags',
+                    \ }
+
+        let g:vista_sidebar_width = 40
+        let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+        let g:vista_close_on_fzf_select = 1 
+
+        "let g:vista#renderer#ctags = 'kind'
+        let g:vista#renderer#enable_icon = 0
+        " not move to the vista window when it is opened
+        let g:vista_stay_on_open = 0
+        let vista_update_on_text_changed = 1
+        "let g:vista_ctags_cmd = {
+        "            \ 'haskell': 'hasktags -x -o - -c',
+        "            \ 'cpp': 'ctags --fields=+niaztkS --c-kinds=+px --c++-kinds=+px',
+        "            \ }
+        augroup vista_
+            autocmd!
+            autocmd BufReadPost * if count(g:bundle_groups, &ft) | Vista!! | endif
+            "autocmd BufEnter * if count(g:bundle_groups, &ft) | Vista | endif
+            autocmd QuitPre * if count(g:bundle_groups, &ft) | Vista! | endif
+        augroup END
+    endif
+
+    Plug 'scrooloose/nerdtree'
+    ""NERDTree
+    map <F3> :NERDTreeToggle<CR>
+    imap <F3> <ESC> :NERDTreeToggle<CR>
+    "let NERDTreeWinSize=40
+    "设置NERDTree子窗口位置
+    let NERDTreeWinPos="left"
+    "设置当打开文件后自动关闭NERDtre窗口
+    let NERDTreeQuitOnOpen=1
+
     "Plug 'Auto-Pairs'
     Plug 'tomasr/molokai'
     Plug 'dracula/vim', { 'as': 'dracula' }
     
     "Plug 'AndrewRadev/splitjoin.vim'
-    "Plug 'SirVer/ultisnips'
+    Plug 'SirVer/ultisnips'
     "Plug 'Shougo/echodoc.vim'
     "Plug 'easymotion/vim-easymotion'
     Plug 'terryma/vim-multiple-cursors'
@@ -134,6 +200,52 @@ if count(g:bundle_groups, 'base')
         Plug 'ludovicchabant/vim-gutentags'
         Plug 'TC500/gutentags_plus'
         "Plug 'skywind3000/gutentags_plus'
+        
+        """"""""""""""""""""""""""""""""""""""ctags/cscope"""""""""""""""""""""""""""""""""""""""""
+        " for debug
+        let g:gutentags_trace = 0
+        " gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
+        "let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+        let g:gutentags_project_root = ['.root', '.git']
+        " 所生成的数据文件的名称
+        let g:gutentags_ctags_tagfile = '.tags'
+        " 同时开启 ctags 和 gtags 支持：
+        let g:gutentags_modules = []
+        if executable('gtags-cscope') && executable('gtags')
+            let g:gutentags_modules += ['gtags_cscope']
+        endif
+        if executable('ctags')
+            let g:gutentags_modules += ['ctags']
+        endif
+        " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+        let g:gutentags_cache_dir = expand('~/.cache/tags')
+
+        "let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
+        let g:gutentags_ctags_extra_args = []
+        let g:gutentags_ctags_extra_args += ['--fields=nksSafet']
+        let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+        let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+        " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
+        if s:is_universal_ctags > 0
+            let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
+            "let g:gutentags_ctags_extra_args += ['--output-format=json']
+            let g:gutentags_ctags_extra_args += ['--extras=+qf']
+        endif 
+
+        " 禁用 gutentags 自动加载 gtags 数据库的行为
+        let g:gutentags_auto_add_gtags_cscope = 1
+        " force update tags file
+        let g:gutentags_define_advanced_commands = 1
+        nmap <leader>u :GutentagsUpdate! <CR><CR>
+
+        " gutentags_plus
+        " disable default keymap
+        let g:gutentags_plus_nomap = 1
+        " auto switch to quickfix window
+        let g:gutentags_plus_switch = 1
+        " auto close quickfix if press <CR>
+        let g:gutentags_plus_auto_close_list = 1
+
     endif
 
     if &filetype =='c' || &filetype == 'cpp'
@@ -355,127 +467,6 @@ autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 set cscopetag                  " 使用 cscope 作为 tags 命令
 set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
 
-let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
-let s:is_universal_ctags=str2nr(system('ctags --version | head -n1 | grep ^Universal | wc -l'))
-if s:is_universal_ctags > 0
-    let s:is_exuberant_ctags = 0
-endif
-
-" for tagbar
-if s:is_exuberant_ctags > 0
-    map <F9> :TagbarToggle<CR>
-    let g:tagbar_map_showproto = "<leader><leader>"
-    let g:tagbar_map_togglesort = "<leader>s"
-    let g:tagbar_width = 30
-    let g:tagbar_autofocus = 1
-    let g:tagbar_autoshowtag = 1
-    " open tagbar if ext match
-    if !&diff
-        augroup tagbar_
-            autocmd!
-            autocmd BufReadPost * if count(g:bundle_groups, &ft) | call tagbar#autoopen() | endif
-        augroup END
-    endif
-endif
-
-" for vista
-if s:is_universal_ctags > 0
-    nmap <F9> :Vista!!<CR>
-    " for TagbarToggle
-    map <F7>  :TagbarToggle <CR>
-    imap <F7>  <ESC> :TagbarToggle <CR>
-    "let g:vista_log_file = '/tmp/vista.log'
-    let g:vista_default_executive = 'coc' "ctags |vim_lsp',
-    let g:vista_executive_for = {
-                \ 'cpp': 'ctags',
-                \ 'c': 'ctags',
-                \ 'go': 'ctags',
-                \ }
-
-    let g:vista_sidebar_width = 40
-    let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
-    let g:vista_close_on_fzf_select = 1 
-   
-    "let g:vista#renderer#ctags = 'kind'
-    let g:vista#renderer#enable_icon = 0
-    " not move to the vista window when it is opened
-    let g:vista_stay_on_open = 0
-    let vista_update_on_text_changed = 1
-    "let g:vista_ctags_cmd = {
-    "            \ 'haskell': 'hasktags -x -o - -c',
-    "            \ 'cpp': 'ctags --fields=+niaztkS --c-kinds=+px --c++-kinds=+px',
-    "            \ }
-    augroup vista_
-        autocmd!
-        autocmd BufReadPost * if count(g:bundle_groups, &ft) | Vista!! | endif
-        "autocmd BufEnter * if count(g:bundle_groups, &ft) | Vista | endif
-        autocmd QuitPre * if count(g:bundle_groups, &ft) | Vista! | endif
-    augroup END
-endif
-
-" for debug
-let g:gutentags_trace = 0
-" gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
-"let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
-let g:gutentags_project_root = ['.root', '.git']
-" 所生成的数据文件的名称
-let g:gutentags_ctags_tagfile = '.tags'
-" 同时开启 ctags 和 gtags 支持：
-let g:gutentags_modules = []
-if executable('gtags-cscope') && executable('gtags')
-	let g:gutentags_modules += ['gtags_cscope']
-endif
-if executable('ctags')
-	let g:gutentags_modules += ['ctags']
-endif
-" 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
-let g:gutentags_cache_dir = expand('~/.cache/tags')
-
-"let g:gutentags_ctags_extra_args = ['--fields=+niaztkS']
-let g:gutentags_ctags_extra_args = []
-let g:gutentags_ctags_extra_args += ['--fields=nksSafet']
-let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-" 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
-if s:is_universal_ctags > 0
-    "let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-    let g:gutentags_ctags_extra_args += ['--output-format=json']
-    let g:gutentags_ctags_extra_args += ['--extras=+qf']
-endif 
-
-" 禁用 gutentags 自动加载 gtags 数据库的行为
-let g:gutentags_auto_add_gtags_cscope = 1
-" force update tags file
-let g:gutentags_define_advanced_commands = 1
-nmap <leader>u :GutentagsUpdate! <CR><CR>
-
-" gutentags_plus
-" disable default keymap
-let g:gutentags_plus_nomap = 1
-" auto switch to quickfix window
-let g:gutentags_plus_switch = 1
-" auto close quickfix if press <CR>
-let g:gutentags_plus_auto_close_list = 1
-" find this symbol
-noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-" find this definition
-noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-" find functions calling this function
-noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-"" find this text string
-"noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-"" find this egrep pattern
-noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-"" find this file
-"noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-"" find files #including this file
-"noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-"" find functions called by this function
-"noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-"" find places where this symbol is assigned a value
-"noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-
-
 """"""""""""""""""""""""""""""""""""""ncoc"""""""""""""""""""""""""""""""""""""""""""""""""
 " coc.nvim
 if exists("s:enable_coc")  && s:enable_coc == 1
@@ -523,48 +514,97 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     endif
  
     " let g:node_client_debug = 1
-    " Use K to show documentation in preview window.
-    function! s:show_documentation()
-        if (index(['vim','help'], &filetype) >= 0)
-            execute 'h '.expand('<cword>')
-        else
-            call CocActionAsync('doHover')
-        endif
-    endfunction
-    call coc#config("highlight.colors.enable", 1)
-    nnoremap <silent> <leader>gh :call <SID>show_documentation()<CR>
-    augroup coc_
-        autocmd!
-        " Highlight the symbol and its references when holding the cursor.
-        autocmd CursorHold * silent call CocActionAsync('highlight')
-        "autocmd CursorHold * silent call CocActionAsync('doHover')
-    augroup END
 	" Show all diagnostics.
     nnoremap <silent> <leader>ga  :<C-u>CocList diagnostics<cr>
     " rename the current word in the cursor
     nmap <leader>gn <Plug>(coc-rename)
 
-    " Use <c-space> to trigger completion.
-    inoremap <silent><expr> <c-space> coc#refresh()
-    " Use `[g` and `]g` to navigate diagnostics
+	" Use <c-space> to trigger completion
+	if has('nvim')
+		inoremap <silent><expr> <c-space> coc#refresh()
+	else
+		inoremap <silent><expr> <c-@> coc#refresh()
+	endif
+    
+	" Use `[g` and `]g` to navigate diagnostics
     nmap <silent> [g <Plug>(coc-diagnostic-prev)
     nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
     " GoTo code navigation.
     nmap <silent> <C-g> <Plug>(coc-definition)
     nmap <silent> <leader>gd <Plug>(coc-definition)
+    nmap <silent> <leader>gg <Plug>(coc-definition)
     nmap <silent> <leader>gt <Plug>(coc-type-definition)
     nmap <silent> <leader>gi <Plug>(coc-implementation)
-    nmap <silent> <leader>gr <Plug>(coc-references)
+	nmap <silent> <leader>gr <Plug>(coc-references)
+
+	" Use K to show documentation in preview window
+	nnoremap <silent> K :call ShowDocumentation()<CR>
+
+	function! ShowDocumentation()
+		if CocAction('hasProvider', 'hover')
+			call CocActionAsync('doHover')
+		else
+			call feedkeys('K', 'in')
+		endif
+	endfunction
+
+	" Highlight the symbol and its references when holding the cursor
+	autocmd CursorHold * silent call CocActionAsync('highlight')
 
     " Apply AutoFix to problem on the current line.
     nmap <leader>gy <Plug>(coc-fix-current)
-    
+
+	" Formatting selected code
+	xmap <leader>f  <Plug>(coc-format-selected)
+	nmap <leader>f  <Plug>(coc-format-selected)
+
+	augroup mygroup
+		autocmd!
+		" Setup formatexpr specified filetype(s)
+		autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+		" Update signature help on jump placeholder
+		autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+	augroup end 
+
     let g:SuperTabDefaultCompletionType = 'context'
     "inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
     inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-endif
+    
+    """"""""""""""""GscopeFind""""""""""""""""""""
+    " find this symbol
+    noremap <silent> <leader>js :GscopeFind s <C-R><C-W><cr>
+    " find functions called bj this function
+    noremap <silent> <leader>jd :GscopeFind d <C-R><C-W><cr>
+    " find this definition
+    noremap <silent> <leader>jg :GscopeFind g <C-R><C-W><cr>
+    " find functions calling jhis function
+    noremap <silent> <leader>jc :GscopeFind c <C-R><C-W><cr>
+    "" find this text string
+    noremap <silent> <leader>jt :GscopeFind t <C-R><C-W><cr>
+    "" find this egrep patterj
+    noremap <silent> <leader>je :GscopeFind e <C-R><C-W><cr>
 
+else
+    " find this symbol
+    noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+    " find functions called bg this function
+    noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+    " find this definition
+    noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+    " find functions calling ghis function
+    noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+    "" find this text string
+    noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+    "" find this egrep patterg
+    noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+    "" find this file
+    "noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+    "" find files #including this file
+    "noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+    "" find places where this symbol is assigned a value
+    "noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+endif
 
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -620,15 +660,6 @@ endif
 autocmd BufNewFile * normal G
 
 """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
-""NERDTree
-map <F3> :NERDTreeToggle<CR>
-imap <F3> <ESC> :NERDTreeToggle<CR>
-"let NERDTreeWinSize=40
-"设置NERDTree子窗口位置
-let NERDTreeWinPos="left"
-"设置当打开文件后自动关闭NERDtre窗口
-let NERDTreeQuitOnOpen=1
-
 """""""""""""""""""""" nerdtree end """""""""""""""""""""""
 " for style
 "调用AStyle程序，进行代码美化  
