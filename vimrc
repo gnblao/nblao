@@ -214,9 +214,9 @@ if count(g:bundle_groups, 'base')
         if executable('gtags-cscope') && executable('gtags')
             let g:gutentags_modules += ['gtags_cscope']
         endif
-        if executable('ctags')
-            let g:gutentags_modules += ['ctags']
-        endif
+        "if executable('ctags')
+        "    let g:gutentags_modules += ['ctags']
+        "endif
         " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
         let g:gutentags_cache_dir = expand('~/.cache/tags')
 
@@ -242,7 +242,7 @@ if count(g:bundle_groups, 'base')
         " disable default keymap
         let g:gutentags_plus_nomap = 1
         " auto switch to quickfix window
-        let g:gutentags_plus_switch = 1
+        let g:gutentags_plus_switch = 2
         " auto close quickfix if press <CR>
         let g:gutentags_plus_auto_close_list = 1
 
