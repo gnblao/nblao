@@ -168,12 +168,17 @@ if count(g:bundle_groups, 'base')
     "let g:clang_format#code_style = 'Microsoft'
     let g:clang_format#code_style = 'LLVM'
     let g:clang_format#style_options = {
-                \ "ColumnLimit" : 79,
+                \ "ColumnLimit" : 99,
+                \ "BreakBeforeBraces": "Allman",
+                \ "IncludeBlocks": "Regroup",
                 \ "AccessModifierOffset" : -4}
 
     "            \ "AlignConsecutiveMacros": "true",
     "            \ "AlignConsecutiveAssignments": "true",
     "            \ "AlignConsecutiveDeclarations": "true",
+    "            \ "BreakBeforeBraces": "Linux",
+    "            \ "BreakBeforeBraces": "Allman",
+    "            \ "IncludeBlocks": "Regroup",
     " map to <Leader>cf in C++ code
     autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
     autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
