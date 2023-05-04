@@ -170,15 +170,26 @@ if count(g:bundle_groups, 'base')
     let g:clang_format#style_options = {
                 \ "ColumnLimit" : 99,
                 \ "BreakBeforeBraces": "Allman",
+                \ "AlignArrayOfStructures": "Left",
                 \ "IncludeBlocks": "Regroup",
+                \ "IndentWidth": 4,
+                \ "AllowShortIfStatementsOnASingleLine": "false",
+                \ "AllowShortFunctionsOnASingleLine": "InlineOnly",
+                \ "AlignConsecutiveMacros": "AcrossEmptyLines",
                 \ "AccessModifierOffset" : -4}
 
+    "            \ "UseTab": "Always",
+    "            \ "AccessModifierOffset" : -8}
     "            \ "AlignConsecutiveMacros": "true",
+    "            \ "AlignConsecutiveMacros": "AcrossEmptyLines",
     "            \ "AlignConsecutiveAssignments": "true",
     "            \ "AlignConsecutiveDeclarations": "true",
     "            \ "BreakBeforeBraces": "Linux",
     "            \ "BreakBeforeBraces": "Allman",
+    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
     "            \ "IncludeBlocks": "Regroup",
+    "            \ "AlignArrayOfStructures": "Left",
+    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
     " map to <Leader>cf in C++ code
     autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
     autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
@@ -266,7 +277,8 @@ if count(g:bundle_groups, 'base')
 endif
 
 if exists("s:enable_coc")  && s:enable_coc == 1
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 endif
 
 if count(g:bundle_groups, 'python') && &filetype == 'python'

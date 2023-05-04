@@ -12,6 +12,9 @@ ln -s `pwd`/global.rc ~/.global.rc
 # tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
+# install yarn for coc.nvim nodejs
+sudo yum -y install nodejs-devel && curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
+
 if read -p "tmux prefix is C-a? [y/n]:" read_flg
 then
     if [ "$read_flg" == "y" ]; then
