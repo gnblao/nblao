@@ -143,7 +143,7 @@ if count(g:bundle_groups, 'base')
     Plug 'dracula/vim', { 'as': 'dracula' }
     
     "Plug 'AndrewRadev/splitjoin.vim'
-    Plug 'SirVer/ultisnips'
+    "Plug 'SirVer/ultisnips'
     "Plug 'Shougo/echodoc.vim'
     
     "Plug 'easymotion/vim-easymotion'
