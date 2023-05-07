@@ -26,7 +26,6 @@ let s:builty_vim = 1
 " 8. run vim, wait for plugins auto install
 " 9. well done!
 
-
 " check os
 if !exists("s:os")
     if has("win64") || has("win32") || has("win16")
@@ -38,6 +37,16 @@ if !exists("s:os")
     endif
 endif
 
+"自动语法高亮
+syntax on
+" 打开语法高亮
+syntax enable                
+" 检测文件类型
+filetype on
+filetype indent on           " 针对不同的文件类型采用不同的缩进格式
+filetype plugin on           " 针对不同的文件类型加载对应的插件
+filetype plugin indent on    " 启用自动补全
+filetype detect
 
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
@@ -443,16 +452,6 @@ set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strf
 set completeopt=preview,menu 
 "set completeopt=menu 
 
-"自动语法高亮
-syntax on
-" 打开语法高亮
-syntax enable                
-" 检测文件类型
-filetype on
-filetype indent on           " 针对不同的文件类型采用不同的缩进格式
-filetype plugin on           " 针对不同的文件类型加载对应的插件
-filetype plugin indent on    " 启用自动补全
-
 " auto close preview when complete done
 "autocmd CompleteDone * pclose
 
@@ -515,7 +514,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     if &filetype == 'golang'
         let g:coc_global_extensions += ['coc-go']
     endif
-   if &filetype == 'c' || &filetype == 'cpp'
+    if &filetype == 'c' || &filetype == 'cpp'
         let g:coc_global_extensions += ['coc-clangd']
         call coc#config('clangd.semanticHighlighting', 1)
         call coc#config('coc.preferences.semanticTokensHighlights', 0)
@@ -592,7 +591,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     " find functions called bj this function
     noremap <silent> <leader>jd :GscopeFind d <C-R><C-W><cr>
     " find this definition
-    noremap <silent> <leader>jg :GscopeFind g <C-R><C-W><cr>
+    noremap <silent> <leader>jj :GscopeFind g <C-R><C-W><cr>
     " find functions calling jhis function
     noremap <silent> <leader>jc :GscopeFind c <C-R><C-W><cr>
     "" find this text string
@@ -709,12 +708,6 @@ endfunc
 "映射代码美化函数到Shift+f快捷键  
 map <F12> <Esc>:call CodeFormat()<CR>  
 
-"通过事件设置文件类型
-"au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
-"au BufRead,BufNewFile *.{py}   set filetype=python
-"au BufRead,BufNewFile *.{go}   set filetype=go
-"au BufRead,BufNewFile *.{js}   set filetype=javascript
-
 "根据文件类型设置词典
 au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
 au FileType css        setlocal dict+=~/.vim/dict/css.dict
@@ -725,8 +718,6 @@ au FileType scale      setlocal dict+=~/.vim/dict/scale.dict
 au FileType javascript setlocal dict+=~/.vim/dict/javascript.dict
 au FileType html       setlocal dict+=~/.vim/dict/javascript.dict
 au FileType html       setlocal dict+=~/.vim/dict/css.dict
-
-
 
 let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
