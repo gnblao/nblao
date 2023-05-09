@@ -286,8 +286,11 @@ if count(g:bundle_groups, 'base')
 endif
 
 if exists("s:enable_coc")  && s:enable_coc == 1
-    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+    if s:os == 'Darwin'
+        Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    else
+        Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+    endif
 endif
 
 if count(g:bundle_groups, 'python') && &filetype == 'python'
