@@ -150,7 +150,10 @@ if count(g:bundle_groups, 'base')
     "Plug 'Auto-Pairs'
     Plug 'tomasr/molokai'
     Plug 'dracula/vim', { 'as': 'dracula' }
-    
+
+    Plug 'google/vim-maktaba'
+    Plug 'bazelbuild/vim-bazel'
+
     "Plug 'AndrewRadev/splitjoin.vim'
     "Plug 'SirVer/ultisnips'
     "Plug 'Shougo/echodoc.vim'
@@ -181,10 +184,20 @@ if count(g:bundle_groups, 'base')
                 \ "BreakBeforeBraces": "Allman",
                 \ "AlignArrayOfStructures": "Left",
                 \ "IncludeBlocks": "Regroup",
+                \ "IncludeCategories" : [
+                \ {"Regex": "^<sys/.*\.h>", "Priority":-7, "SortPriority": -7, "CaseSensitive":"false"},
+                \ {"Regex": "^<openssl/.*\.h>", "Priority":-3, "SortPriority": -3, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*/.*\.h>", "Priority":-6, "SortPriority": -6, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*\.h>", "Priority":-5, "SortPriority": -5, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*>", "Priority":-4, "SortPriority": -4, "CaseSensitive":"false"},
+                \ {"Regex": "^\"[a-z].*\.h", "Priority":-2, "SortPriority": -2, "CaseSensitive":"false"},
+                \ {"Regex": "^\".*", "Priority":-1, "SortPriority": -1, "CaseSensitive":"false"},
+                \ ],
                 \ "IndentWidth": 4,
                 \ "AllowShortIfStatementsOnASingleLine": "false",
                 \ "AllowShortFunctionsOnASingleLine": "InlineOnly",
                 \ "AlignConsecutiveMacros": "AcrossEmptyLines",
+                \ "AllowShortLoopsOnASingleLine": "false",
                 \ "AccessModifierOffset" : -4}
 
     "            \ "UseTab": "Always",
@@ -225,6 +238,7 @@ if count(g:bundle_groups, 'base')
     map <F5> :AddHeader<CR> 
 
 	if &filetype =='c' || &filetype == 'cpp' || &filetype == 'java'
+        Plug 'grailbio/bazel-compilation-database'
         " async generate and update ctags/gtags
         Plug 'ludovicchabant/vim-gutentags'
         Plug 'TC500/gutentags_plus'
@@ -235,7 +249,7 @@ if count(g:bundle_groups, 'base')
         let g:gutentags_trace = 0
         " gutentags 搜索工程目录的标志，当前文件路径向上递归直到碰到这些文件/目录名
         "let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
-        let g:gutentags_project_root = ['.root', '.git']
+        let g:gutentags_project_root = ['.git', '.root']
         " 所生成的数据文件的名称
         let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
@@ -243,9 +257,9 @@ if count(g:bundle_groups, 'base')
         if executable('gtags-cscope') && executable('gtags')
             let g:gutentags_modules += ['gtags_cscope']
         endif
-        "if executable('ctags')
-        "    let g:gutentags_modules += ['ctags']
-        "endif
+        if executable('ctags')
+            let g:gutentags_modules += ['ctags']
+        endif
         " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
         let g:gutentags_cache_dir = expand('~/.cache/tags')
 
@@ -398,6 +412,9 @@ set laststatus=2                " 启动显示状态行(1),总是显示状态行
 set showmatch                   " 高亮显示匹配的括号
 set matchtime=1                 " 匹配括号高亮的时间（单位是十分之一秒）
 set tabstop=4                   " Tab键的宽度
+if match(expand("%:p"), "vpp") > 0
+    set tabstop=8                   " Tab键的宽度
+endif
 set softtabstop=4               " 统一缩进为4 : 设置按BackSpace的时候可以一次删除掉4个空格
 set shiftwidth=4                " 设定 << 和 >> 命令移动时的宽度为 4
 set autoindent                  " 自动缩进
@@ -549,11 +566,12 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 
     " GoTo code navigation.
     nmap <silent> <C-g> <Plug>(coc-definition)
-    nmap <silent> <leader>gd <Plug>(coc-definition)
+    nmap <silent> <leader>gd <Plug>(coc-declaration)
     nmap <silent> <leader>gg <Plug>(coc-definition)
     nmap <silent> <leader>gt <Plug>(coc-type-definition)
     nmap <silent> <leader>gi <Plug>(coc-implementation)
 	nmap <silent> <leader>gr <Plug>(coc-references)
+	nmap <silent> <leader>gs <Plug>(coc-references-used)
 
 	" Use K to show documentation in preview window
 	nnoremap <silent> K :call ShowDocumentation()<CR>

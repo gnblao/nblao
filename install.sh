@@ -14,6 +14,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # install yarn for coc.nvim nodejs
 sudo yum -y install nodejs-devel && curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
+sudo yum -y install global-ctags
 
 if read -p "tmux prefix is C-a? [y/n]:" read_flg
 then
