@@ -172,54 +172,6 @@ if count(g:bundle_groups, 'base')
     "xmap <Leader>f <Plug>(easymotion-bd-f)
     "omap <Leader>f <Plug>(easymotion-bd-f)
 
-    Plug 'terryma/vim-multiple-cursors'
-    Plug 'rhysd/vim-clang-format'
-    let g:clang_format#auto_format = 0
-    let g:clang_format#auto_format_on_insert_leave = 0
-    "let g:clang_format#code_style = 'google'
-    "let g:clang_format#code_style = 'Microsoft'
-    let g:clang_format#code_style = 'LLVM'
-    let g:clang_format#style_options = {
-                \ "ColumnLimit" : 99,
-                \ "BreakBeforeBraces": "Allman",
-                \ "AlignArrayOfStructures": "Left",
-                \ "IncludeBlocks": "Regroup",
-                \ "IncludeCategories" : [
-                \ {"Regex": "^<sys/.*\.h>", "Priority":-7, "SortPriority": -7, "CaseSensitive":"false"},
-                \ {"Regex": "^<openssl/.*\.h>", "Priority":-3, "SortPriority": -3, "CaseSensitive":"false"},
-                \ {"Regex": "^<.*/.*\.h>", "Priority":-6, "SortPriority": -6, "CaseSensitive":"false"},
-                \ {"Regex": "^<.*\.h>", "Priority":-5, "SortPriority": -5, "CaseSensitive":"false"},
-                \ {"Regex": "^<.*>", "Priority":-4, "SortPriority": -4, "CaseSensitive":"false"},
-                \ {"Regex": "^\"[a-z].*\.h", "Priority":-2, "SortPriority": -2, "CaseSensitive":"false"},
-                \ {"Regex": "^\".*", "Priority":-1, "SortPriority": -1, "CaseSensitive":"false"},
-                \ ],
-                \ "IndentWidth": 4,
-                \ "AllowShortIfStatementsOnASingleLine": "false",
-                \ "AllowShortFunctionsOnASingleLine": "InlineOnly",
-                \ "AlignConsecutiveMacros": "AcrossEmptyLines",
-                \ "AllowShortLoopsOnASingleLine": "false",
-                \ "AccessModifierOffset" : -4}
-
-    "            \ "UseTab": "Always",
-    "            \ "AccessModifierOffset" : -8}
-    "            \ "AlignConsecutiveMacros": "true",
-    "            \ "AlignConsecutiveMacros": "AcrossEmptyLines",
-    "            \ "AlignConsecutiveAssignments": "true",
-    "            \ "AlignConsecutiveDeclarations": "true",
-    "            \ "BreakBeforeBraces": "Linux",
-    "            \ "BreakBeforeBraces": "Allman",
-    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
-    "            \ "IncludeBlocks": "Regroup",
-    "            \ "AlignArrayOfStructures": "Left",
-    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
-    " map to <Leader>cf in C++ code
-    autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-    autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
-    " if you install vim-operator-user
-    autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
-    " Toggle auto formatting:
-    nmap <Leader>C :ClangFormatAutoToggle<CR>
-
     Plug 'bujnlc8/vim-translator'
     let g:translator_cache=0
     let g:translator_cache_path='~/.cache/vim-translator'
@@ -352,7 +304,90 @@ if count(g:bundle_groups, 'json') && &filetype == 'json'
     Plug 'elzr/vim-json'
 endif
 
+    Plug 'terryma/vim-multiple-cursors'
+    Plug 'rhysd/vim-clang-format'
+    let g:clang_format#auto_format = 0
+    let g:clang_format#auto_format_on_insert_leave = 0
+    "let g:clang_format#code_style = 'google'
+    "let g:clang_format#code_style = 'Microsoft'
+    let g:clang_format#code_style = 'LLVM'
+    let g:clang_format#style_options = {
+                \ "ColumnLimit" : 99,
+                \ "BreakBeforeBraces": "Allman",
+                \ "AlignArrayOfStructures": "Left",
+                \ "IncludeBlocks": "Regroup",
+                \ "IncludeCategories" : [
+                \ {"Regex": "^<sys/.*\.h>", "Priority":-7, "SortPriority": -7, "CaseSensitive":"false"},
+                \ {"Regex": "^<openssl/.*\.h>", "Priority":-3, "SortPriority": -3, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*/.*\.h>", "Priority":-6, "SortPriority": -6, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*\.h>", "Priority":-5, "SortPriority": -5, "CaseSensitive":"false"},
+                \ {"Regex": "^<.*>", "Priority":-4, "SortPriority": -4, "CaseSensitive":"false"},
+                \ {"Regex": "^\"[a-z].*\.h", "Priority":-2, "SortPriority": -2, "CaseSensitive":"false"},
+                \ {"Regex": "^\".*", "Priority":-1, "SortPriority": -1, "CaseSensitive":"false"},
+                \ ],
+                \ "AllowShortIfStatementsOnASingleLine": "false",
+                \ "AllowShortFunctionsOnASingleLine": "InlineOnly",
+                \ "AlignConsecutiveMacros": "AcrossEmptyLines",
+                \ "AllowShortLoopsOnASingleLine": "false",
+                \ "AccessModifierOffset" : -4}
+
+    "            \ "IndentWidth": 4,
+    "            \ "UseTab": "Always",
+    "            \ "AccessModifierOffset" : -8}
+    "            \ "AlignConsecutiveMacros": "true",
+    "            \ "AlignConsecutiveMacros": "AcrossEmptyLines",
+    "            \ "AlignConsecutiveAssignments": "true",
+    "            \ "AlignConsecutiveDeclarations": "true",
+    "            \ "BreakBeforeBraces": "Linux",
+    "            \ "BreakBeforeBraces": "Allman",
+    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
+    "            \ "IncludeBlocks": "Regroup",
+    "            \ "AlignArrayOfStructures": "Left",
+    "            \ "AlignAfterOpenBracket": "AlwaysBreak",
+    
+    " map to <Leader>cf in C++ code
+    autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+    autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+    " if you install vim-operator-user
+    autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+    " Toggle auto formatting:
+    nmap <Leader>C :ClangFormatAutoToggle<CR>
+
+
+" Add maktaba and codefmt to the runtimepath.
+" (The latter must be installed before it can be used.)
+Plug 'google/vim-maktaba'
+Plug 'google/vim-codefmt'
+" Also add Glaive, which is used to configure codefmt's maktaba flags. See
+" `:help :Glaive` for usage.
+Plug 'google/vim-glaive'
+
 call plug#end()
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" the glaive#Install() should go after the "call vundle#end()"
+call glaive#Install()
+Glaive codefmt clang_format_style='{
+            \ "BasedOnStyle": "llvm", "IndentWidth": 4,
+            \ "ColumnLimit" : 99,
+            \ "BreakBeforeBraces": "Allman",
+            \ "AlignArrayOfStructures": "Left",
+            \ "IncludeBlocks": "Regroup",
+            \ "IncludeCategories" : [
+            \ {"Regex": "^<sys/.*.h>", "Priority":-7, "SortPriority": -7, "CaseSensitive":"false"},
+            \ {"Regex": "^<openssl/.*.h>", "Priority":-3, "SortPriority": -3, "CaseSensitive":"false"},
+            \ {"Regex": "^<.*/.*.h>", "Priority":-6, "SortPriority": -6, "CaseSensitive":"false"},
+            \ {"Regex": "^<.*.h>", "Priority":-5, "SortPriority": -5, "CaseSensitive":"false"},
+            \ {"Regex": "^<.*>", "Priority":-4, "SortPriority": -4, "CaseSensitive":"false"},
+            \ {"Regex": "^\"[a-z].*.h", "Priority":-2, "SortPriority": -2, "CaseSensitive":"false"},
+            \ {"Regex": "^\".*", "Priority":-1, "SortPriority": -1, "CaseSensitive":"false"},
+            \ ],
+            \ "AllowShortIfStatementsOnASingleLine": "false",
+            \ "AllowShortFunctionsOnASingleLine": "InlineOnly",
+            \ "AlignConsecutiveMacros": "AcrossEmptyLines",
+            \ "AllowShortLoopsOnASingleLine": "false",
+            \ "AccessModifierOffset" : -4}'
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 设置背景主题     
 let g:molokai_original = 1
@@ -531,7 +566,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
         let g:coc_global_extensions += ['coc-pyright']
         call coc#config('python.pythonPath', '/usr/bin/python3')
     endif
-    if &filetype == 'golang'
+    if &filetype == 'golang' || &filetype == 'go'
         let g:coc_global_extensions += ['coc-go']
     endif
     if &filetype == 'c' || &filetype == 'cpp'
