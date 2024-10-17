@@ -22,9 +22,9 @@ if [ "$TERM" = "xterm" ]; then
 	export TERM=xterm-256color
 fi
 
-alias tmux='tmux -2'
+#alias tmux='tmux -2'
 
-
-export GO111MODULE=on
+export LANG="zh_CN.UTF-8"
+export LC_ALL="zh_CN.UTF-8"
 export GOPROXY=https://goproxy.cn
 export PATH=$PATH:${GOPATH//://bin:}/bin
