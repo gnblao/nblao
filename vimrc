@@ -100,8 +100,8 @@ if count(g:bundle_groups, 'base')
         endif
     endif
 
-    "Plug 'liuchengxu/vista.vim'
-    Plug 'gnblao/vista.vim'
+    Plug 'liuchengxu/vista.vim'
+    "Plug 'gnblao/vista.vim'
     " for vista
     if s:is_universal_ctags > 0
         nmap <F9> :Vista!!<CR>
@@ -267,14 +267,14 @@ if count(g:bundle_groups, 'python') && &filetype == 'python'
     au FileType python set omnifunc=pythoncomplete#Complete
 endif
 
-if count(g:bundle_groups, 'golang') && &filetype == 'golang'
-    "Plug 'fatih/vim-go'
-    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-    Plug 'dgryski/vim-godef'
-    Plug 'Blackrush/vim-gocode'
-    " vim-go settings
-    let g:go_fmt_command = "goimports"
-endif
+"if count(g:bundle_groups, 'golang') && &filetype == 'go'
+"    "Plug 'fatih/vim-go'
+"    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+"    Plug 'dgryski/vim-godef'
+"    Plug 'Blackrush/vim-gocode'
+"    " vim-go settings
+"    let g:go_fmt_command = "goimports"
+"endif
 
 if count(g:bundle_groups, 'html') && &filetype == 'html'
     " emmet
@@ -362,6 +362,9 @@ endif
     " `:help :Glaive` for usage.
     Plug 'google/vim-glaive'
 
+    " Plug 'TabbyML/vim-tabby'
+    " let g:tabby_keybinding_accept = '<Tab>'
+
 call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " the glaive#Install() should go after the "call vundle#end()"
@@ -446,7 +449,7 @@ set showcmd                     " 输入的命令显示出来，看的清楚些
 set laststatus=2                " 启动显示状态行(1),总是显示状态行(2) 
 set showmatch                   " 高亮显示匹配的括号
 set matchtime=1                 " 匹配括号高亮的时间（单位是十分之一秒）
-set tabstop=4                   " Tab键的宽度
+set tabstop=8                   " Tab键的宽度
 if match(expand("%:p"), "vpp") > 0
     set tabstop=8                   " Tab键的宽度
 endif
@@ -498,6 +501,9 @@ set foldcolumn=0
 set foldlevel=3 
 " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
 "set ignorecase
+
+set nofixeol
+set nofixendofline
 
 "状态行显示的内容 
 "set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}\ [PWD=%{getcwd()}]\ 
