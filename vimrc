@@ -40,7 +40,7 @@ endif
 "自动语法高亮
 syntax on
 " 打开语法高亮
-syntax enable                
+syntax enable
 " 检测文件类型
 filetype on
 filetype indent on           " 针对不同的文件类型采用不同的缩进格式
@@ -48,6 +48,7 @@ filetype plugin on           " 针对不同的文件类型加载对应的插件
 filetype plugin indent on    " 启用自动补全
 filetype detect
 
+autocmd BufWritePre * :%s/\s\+$//e
 " check is enable system clipboard
 "if has('clipboard') && !empty($DISPLAY)
 "    let s:enable_system_clipboard = 1
@@ -61,7 +62,7 @@ filetype detect
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('~/.vim/bundle/vim-plug/plug.vim'))
     "silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && cd ~/.vim/bundle/vim-plug && ln -s ../vim-plug  autoload 
+    silent !git clone https://github.com/junegunn/vim-plug.git ~/.vim/bundle/vim-plug && cd ~/.vim/bundle/vim-plug && ln -s ../vim-plug  autoload
     augroup vim-plug_
         autocmd!
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
@@ -73,8 +74,8 @@ set rtp+=~/.vim/bundle/vim-plug/
 call plug#begin('~/.vim/bundle')
 if count(g:bundle_groups, 'base')
     Plug 'junegunn/vim-plug'
-    Plug 'godlygeek/tabular'          
-   
+    Plug 'godlygeek/tabular'
+
     "Plug 'majutsushi/tagbar'
     Plug 'preservim/tagbar'
     let s:is_exuberant_ctags=str2nr(system('ctags --version | head -n1 | grep ^Exuberant | wc -l'))
@@ -118,7 +119,7 @@ if count(g:bundle_groups, 'base')
 
         let g:vista_sidebar_width = 40
         let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
-        let g:vista_close_on_fzf_select = 1 
+        let g:vista_close_on_fzf_select = 1
 
         "let g:vista#renderer#ctags = 'kind'
         let g:vista#renderer#enable_icon = 0
@@ -157,7 +158,7 @@ if count(g:bundle_groups, 'base')
     "Plug 'AndrewRadev/splitjoin.vim'
     "Plug 'SirVer/ultisnips'
     "Plug 'Shougo/echodoc.vim'
-    
+
     "Plug 'easymotion/vim-easymotion'
     "" 设置easymotion的触发键
     "let g:EasyMotion_leader_key = '\'
@@ -175,7 +176,7 @@ if count(g:bundle_groups, 'base')
     Plug 'bujnlc8/vim-translator'
     let g:translator_cache=0
     let g:translator_cache_path='~/.cache/vim-translator'
-    let g:translator_channel='youdao'      " youdao|baidu   
+    let g:translator_channel='baidu'      " youdao|baidu
     let g:translator_outputype='popup'      " popup|echo|
     vnoremap <leader>yd :<C-u>Tv<CR>
     nnoremap <leader>yd :<C-u>Tc<CR>
@@ -187,7 +188,7 @@ if count(g:bundle_groups, 'base')
 	let g:header_field_author_email = 'gnblao'
 	let g:header_auto_add_header = 0
     let g:header_auto_update_header = 1
-    map <F5> :AddHeader<CR> 
+    map <F5> :AddHeader<CR>
 
 	if &filetype =='c' || &filetype == 'cpp' || &filetype == 'java'
         Plug 'grailbio/bazel-compilation-database'
@@ -195,7 +196,7 @@ if count(g:bundle_groups, 'base')
         Plug 'ludovicchabant/vim-gutentags'
         Plug 'TC500/gutentags_plus'
         "Plug 'skywind3000/gutentags_plus'
-        
+
         """"""""""""""""""""""""""""""""""""""ctags/cscope"""""""""""""""""""""""""""""""""""""""""
         " for debug
         let g:gutentags_trace = 0
@@ -225,7 +226,7 @@ if count(g:bundle_groups, 'base')
             let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
             "let g:gutentags_ctags_extra_args += ['--output-format=json']
             let g:gutentags_ctags_extra_args += ['--extras=+qf']
-        endif 
+        endif
 
         " 禁用 gutentags 自动加载 gtags 数据库的行为
         let g:gutentags_auto_add_gtags_cscope = 1
@@ -344,7 +345,7 @@ endif
     "            \ "IncludeBlocks": "Regroup",
     "            \ "AlignArrayOfStructures": "Left",
     "            \ "AlignAfterOpenBracket": "AlwaysBreak",
-    
+
     " map to <Leader>cf in C++ code
     autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
     autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
@@ -392,7 +393,7 @@ Glaive codefmt clang_format_style='{
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 设置背景主题     
+" 设置背景主题
 let g:molokai_original = 1
 let g:rehash256 = 1
 colorscheme molokai
@@ -444,9 +445,9 @@ endif
 " -encode set end -
 
 set nocompatible                " 关闭 vi 兼容模式
-set shortmess=atI               " 启动的时候不显示那个援助乌干达儿童的提示 
-set showcmd                     " 输入的命令显示出来，看的清楚些 
-set laststatus=2                " 启动显示状态行(1),总是显示状态行(2) 
+set shortmess=atI               " 启动的时候不显示那个援助乌干达儿童的提示
+set showcmd                     " 输入的命令显示出来，看的清楚些
+set laststatus=2                " 启动显示状态行(1),总是显示状态行(2)
 set showmatch                   " 高亮显示匹配的括号
 set matchtime=1                 " 匹配括号高亮的时间（单位是十分之一秒）
 set tabstop=8                   " Tab键的宽度
@@ -467,7 +468,7 @@ set cmdheight=2                 " 设定命令行的行数为 1
 set helplang=cn                 " 显示中文帮助
 set langmenu=zh_CN.UTF-8        " 语言设置
 set iskeyword+=_,$,@,%,#,-      " 带有如下符号的单词不要被换行分割
-set backspace=2                 " 启用backspace key 
+set backspace=2                 " 启用backspace key
 set ruler                       " 显示列号
 set scrolloff=6                 " 上下可视行数
 set nobackup                    " 覆盖文件时不备份
@@ -494,24 +495,24 @@ set whichwrap=b,s,<,>,[,]
 "    set t_Sf=^[[3%dm
 "endif
 
-set foldenable                 " 允许折叠   
-set foldmethod=manual          " 手动折叠  
+set foldenable                 " 允许折叠
+set foldmethod=manual          " 手动折叠
 set foldcolumn=0
-"set foldmethod=syntax 
-set foldlevel=3 
+"set foldmethod=syntax
+set foldlevel=3
 " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
 "set ignorecase
 
 set nofixeol
 set nofixendofline
 
-"状态行显示的内容 
-"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}\ [PWD=%{getcwd()}]\ 
+"状态行显示的内容
+"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}\ [PWD=%{getcwd()}]\
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
 
 "see help completeopt
-set completeopt=preview,menu 
-"set completeopt=menu 
+set completeopt=preview,menu
+"set completeopt=menu
 
 " auto close preview when complete done
 "autocmd CompleteDone * pclose
@@ -528,7 +529,7 @@ endif
 " quickfix模式
 "autocmd FileType cpp,c map <buffer> <leader><space> :w<cr>:make<cr>
 
-"ctag gtag cscope  cstags.... 
+"ctag gtag cscope  cstags....
 set cscopetag                  " 使用 cscope 作为 tags 命令
 set cscopeprg='gtags-cscope'   " 使用 gtags-cscope 代替 cscope
 
@@ -544,15 +545,15 @@ if exists("s:enable_coc")  && s:enable_coc == 1
     let g:coc_global_extensions += ['coc-tsserver']
     let g:coc_global_extensions += ['coc-sh']
     let g:coc_global_extensions += ['coc-copilot']
-    
+
     let g:coc_global_extensions += ['coc-explorer']
     call coc#config('explorer.icon.source', 'nvim-web-devicons')
     nmap <F4> <Cmd>CocCommand explorer<CR>
-    
+
     let g:coc_global_extensions += ['coc-clang-format-style-options']
     let g:coc_global_extensions += ['coc-cmake']
     call coc#config('cmake.cmakePath', 'cmake')
-    
+
     if &filetype == 'lua'
         let g:coc_global_extensions += ['coc-lua']
     endif
@@ -587,7 +588,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 
         "highlight LspCxxHlGroupMemberVariable ctermfg=LightGray  guifg=LightGray
     endif
- 
+
     " let g:node_client_debug = 1
 	" Show all diagnostics.
     nnoremap <silent> <leader>ga  :<C-u>CocList diagnostics<cr>
@@ -600,7 +601,7 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 	else
 		inoremap <silent><expr> <c-@> coc#refresh()
 	endif
-    
+
 	" Use `[g` and `]g` to navigate diagnostics
     nmap <silent> [g <Plug>(coc-diagnostic-prev)
     nmap <silent> ]g <Plug>(coc-diagnostic-next)
@@ -641,12 +642,12 @@ if exists("s:enable_coc")  && s:enable_coc == 1
 		autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
 		" Update signature help on jump placeholder
 		autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-	augroup end 
+	augroup end
 
     let g:SuperTabDefaultCompletionType = 'context'
     "inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
     inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-    
+
     """"""""""""""""GscopeFind""""""""""""""""""""
     " find this symbol
     noremap <silent> <leader>js :GscopeFind s <C-R><C-W><cr>
@@ -685,9 +686,9 @@ endif
 """"""""""""""""""""""""""""""""""""""Plug"""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"begin根据文件类型插入内容""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""定义函数SetTitle，自动插入文件头 
+""定义函数SetTitle，自动插入文件头
 let g:project_root = ""
-function! s:SetTitle() abort 
+function! s:SetTitle() abort
     if &filetype == 'cpp'
     "if expand("%:e") == 'cpp'
         call append(line("$"), "#include<iostream>")
@@ -707,12 +708,12 @@ function! s:SetTitle() abort
         call append(line("$"), "\treturn 0;")
         call append(line("$"), "}")
     endif
-    if expand("%:e") == 'h' 
+    if expand("%:e") == 'h'
         if g:project_root == ''
             call append(line("$"), "#ifndef _".toupper(expand("%:r"))."_H")
             call append(line("$"), "#define _".toupper(expand("%:r"))."_H")
             call append(line("$"), "#endif")
-        else 
+        else
             call append(line("$"), "#ifndef ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
             call append(line("$"), "#define ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
             call append(line("$"), "#endif  // ".toupper(substitute(substitute(expand("%:p:r"), g:project_root, "", ""), "/" , "_", "g")."_H_"))
@@ -722,8 +723,8 @@ function! s:SetTitle() abort
         call append(line(".")+6,"public class ".expand("%:r"))
         call append(line(".")+7,"")
     endif
-endfunc 
-autocmd BufNewFile *.cc,*.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call s:SetTitle()" 
+endfunc
+autocmd BufNewFile *.cc,*.cpp,*.[ch],*.sh,*.rb,*.java,*.py exec ":call s:SetTitle()"
 """"end根据文件类型插入内容"""""
 
 "jemp pre write pos
@@ -738,37 +739,37 @@ autocmd BufNewFile * normal G
 """""""""""""""""""""" nerdtree begin """""""""""""""""""""""
 """""""""""""""""""""" nerdtree end """""""""""""""""""""""
 " for style
-"调用AStyle程序，进行代码美化  
-func CodeFormat()  
-          "取得当前光标所在行号  
-          let lineNum = line(".")  
-          "C源程序  
-          if &filetype == 'c'  
-                    "执行调用外部程序的命令  
-                    "exec "%! astyle -A3Lfpjk3NS"  
-                    exec "%! astyle --style=google"  
-          "H头文件(文件类型识别为cpp)，CPP源程序  
-          elseif &filetype == 'cpp'  
-                    "执行调用外部程序的命令  
-                    "exec "%! astyle -A3Lfpjk3NS"  
-                    "exec "%! astyle --style=linux"  
-                    exec "%! astyle --style=allman"  
-                    "exec "%! astyle --style=google"  
-          "JAVA源程序  
-          elseif &filetype == 'java'  
-                    "执行调用外部程序的命令  
-                    exec "%! astyle -A2Lfpjk3NS"  
+"调用AStyle程序，进行代码美化
+func CodeFormat()
+          "取得当前光标所在行号
+          let lineNum = line(".")
+          "C源程序
+          if &filetype == 'c'
+                    "执行调用外部程序的命令
+                    "exec "%! astyle -A3Lfpjk3NS"
+                    exec "%! astyle --style=google"
+          "H头文件(文件类型识别为cpp)，CPP源程序
+          elseif &filetype == 'cpp'
+                    "执行调用外部程序的命令
+                    "exec "%! astyle -A3Lfpjk3NS"
+                    "exec "%! astyle --style=linux"
+                    exec "%! astyle --style=allman"
+                    "exec "%! astyle --style=google"
+          "JAVA源程序
+          elseif &filetype == 'java'
+                    "执行调用外部程序的命令
+                    exec "%! astyle -A2Lfpjk3NS"
           elseif &filetype == 'py'|| &filetype == 'python'
                     exec "%! yapf --style='{based_on_style: google, indent_width: 4}'"
-          else   
-                    "提示信息  
-                    echo "不支持".&filetype."文件类型。"  
-          endif  
-          "返回先前光标所在行  
-          exec lineNum  
-endfunc  
-"映射代码美化函数到Shift+f快捷键  
-map <F12> <Esc>:call CodeFormat()<CR>  
+          else
+                    "提示信息
+                    echo "不支持".&filetype."文件类型。"
+          endif
+          "返回先前光标所在行
+          exec lineNum
+endfunc
+"映射代码美化函数到Shift+f快捷键
+map <F12> <Esc>:call CodeFormat()<CR>
 
 "根据文件类型设置词典
 au FileType php        setlocal dict+=~/.vim/dict/php_funclist.dict
